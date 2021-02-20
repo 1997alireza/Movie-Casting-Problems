@@ -5,7 +5,7 @@ if root[-1] != '/':
     root = root + '/'
 
 # directories
-src = root + 'src'
+src = root + 'src/'
 the_movies_dataset = root + 'datasets/the-movies-dataset/'
 imdb_movies_extensive_dataset = root + 'datasets/IMDb-movies-extensive-dataset/'
 
