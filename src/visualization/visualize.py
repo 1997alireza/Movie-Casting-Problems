@@ -26,7 +26,7 @@ res = ast.literal_eval(k)
 
 # creating graph based on co-acting
 MG = nx.Graph()
-for i in range(10):
+for i in range(50):
     cast = credits['cast'][i]
     res = ast.literal_eval(cast)
     cast_mem = []
@@ -43,7 +43,7 @@ print('no of edges: ', len(MG.edges()))
 conn_comp = list(nx.connected_components(MG))
 print('no of connected components:', len(conn_comp))
 degree_sequence = sorted([len(n) for n in conn_comp], reverse=True)
-print(degree_sequence[:5])
+print(degree_sequence)
 print('The highly connected componenet has no of nodes : ', degree_sequence[0])
 
 # degree histogram
@@ -55,7 +55,7 @@ plt.plot(deg, cnt)
 plt.title("Degree Histogram")
 plt.ylabel("Count")
 plt.xlabel("Degree")
-plt.xlim(0, 200)
+plt.xlim(0, 300)
 
 plt.show()
 visualize(MG)
