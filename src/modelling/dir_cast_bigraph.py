@@ -1,6 +1,8 @@
 import paths
 import pandas as pd
 import networkx as nx
+import matplotlib.pyplot as plt
+from collections import defaultdict
 
 
 def build_graph():
@@ -11,9 +13,11 @@ def build_graph():
     the_movies_df = pd.read_csv(paths.the_movies_dataset + 'credits.csv',
                                 usecols=['cast', 'crew'])
 
+    # the_movies_df = the_movies_df[:100]  # TODO: remove
+
     director_set, cast_set = set(), set()
     director_name, cast_name = {}, {}
-    edges = set()
+    edges_count = defaultdict(int)
 
     for _, row in the_movies_df.iterrows():
         crews = eval(row.crew)
@@ -32,7 +36,7 @@ def build_graph():
             cast_set.add(cast_id)
             cast_name[cast_id] = cast['name']
 
-            edges.add((director_id, cast_id))
+            edges_count[(director_id, cast_id)] += 1
 
     # print(len(director_set))  # 17698
     # print(len(cast_set))  # 205467
@@ -41,12 +45,15 @@ def build_graph():
     dir_cast_graph = nx.Graph()
     dir_cast_graph.add_nodes_from(director_set, bipartite=0)
     dir_cast_graph.add_nodes_from(cast_set, bipartite=1)
-    dir_cast_graph.add_edges_from(edges)
 
-    # print(bipartite.is_bipartite(dir_cast_graph))  # True
+    for edge, count in edges_count.items():
+        weighted_edge = edge + (count,)
+        dir_cast_graph.add_weighted_edges_from([weighted_edge])
 
     return dir_cast_graph
 
 
-
-
+# if __name__ == '__main__':
+#     dir_cast_graph = build_graph()
+#     nx.draw(dir_cast_graph, with_labels=True)
+#     plt.savefig("graph.png")
