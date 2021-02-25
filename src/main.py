@@ -14,7 +14,7 @@ if __name__ == '__main__':
     print(len(the_movies_df))  # 45466
     print(len(imdb_movies_df))  # 85855
     print(len(joined_df))  # 45466
-    # so, all of the movies in the_movies_df are included in imdb_movies_df
+    # so, all of the movies in the_movies_dataset are included in imdb_movies_extensive_dataset
 
     for _, row in joined_df.iterrows():
         print(row)
