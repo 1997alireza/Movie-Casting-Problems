@@ -2,6 +2,23 @@ import paths
 import pandas as pd
 
 if __name__ == '__main__':
+
+    # TODO: remove
+    import pickle, numpy as np
+    import matplotlib.pyplot as plt
+    with open('./modelling/potentialities_10perc.pkl', 'rb') as file:
+        director_cast_potentialities = pickle.load(file)
+    # print(director_cast_potentialities)
+    director_cast_potentialities = np.array(director_cast_potentialities)
+    pots = director_cast_potentialities[:, 2].astype(float)
+    print(pots)
+    print(np.mean(pots))
+    np.histogram(pots)
+
+    _ = plt.hist(pots, bins='auto')  # arguments are passed to np.histogram
+    plt.show()
+    exit()
+
     the_movies_df = pd.read_csv(paths.the_movies_dataset + 'movies_metadata.csv',
                                 usecols=['imdb_id', 'original_title'])
 

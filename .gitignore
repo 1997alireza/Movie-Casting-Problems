@@ -7,3 +7,4 @@ venv/
 datasets/
 
 *.png
+*.pkl
