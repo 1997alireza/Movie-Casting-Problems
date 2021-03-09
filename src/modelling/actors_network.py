@@ -2,9 +2,9 @@ import pandas as pd
 import networkx as nx
 import ast
 from itertools import combinations
-import collections
-import matplotlib.pyplot as plt
 from netwulf import visualize
+
+import paths
 
 pd.set_option('display.max_colwidth', None)
 
@@ -18,13 +18,13 @@ credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv')
 # print(credits.head())
 
 # sample cast entry - just warm up!
-k = credits['cast'][0]
-res = ast.literal_eval(k)
+# k = credits['cast'][0]
+# res = ast.literal_eval(k)
 # print(res[0])
 
 # creating graph based on co-acting
 MG = nx.Graph()
-for i in range(500):
+for i in range(1000):
     cast = credits['cast'][i]
     res = ast.literal_eval(cast)
     cast_mem = []
