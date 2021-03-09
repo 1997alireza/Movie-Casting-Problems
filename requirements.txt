@@ -6,7 +6,7 @@ matplotlib==3.3.4
 networkx==2.5
 netwulf==0.1.5
 numpy==1.20.1
-pandas
+pandas==1.1.5
 Pillow==8.1.1
 pyparsing==2.4.7
 python-dateutil==2.8.1
@@ -15,4 +15,5 @@ scikit-learn==0.24.1
 scipy==1.6.1
 simplejson==3.17.2
 six==1.15.0
+sklearn==0.0
 threadpoolctl==2.1.0
