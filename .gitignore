@@ -5,6 +5,7 @@ __pycache__
 test/
 venv/
 datasets/
+temporal_data/
 
 *.png
 *.pkl

@@ -8,5 +8,6 @@ if root[-1] != '/':
 src = root + 'src/'
 the_movies_dataset = root + 'datasets/the-movies-dataset/'
 imdb_movies_extensive_dataset = root + 'datasets/IMDb-movies-extensive-dataset/'
+temporal_data = root + 'temporal_data/'
 
 # files

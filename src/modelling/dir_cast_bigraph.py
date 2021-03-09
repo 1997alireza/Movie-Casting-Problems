@@ -1,31 +1,16 @@
-import paths
-import pandas as pd
 import numpy as np
 import networkx as nx
-import matplotlib.pyplot as plt
 from collections import defaultdict
-import pickle
 from sklearn.metrics.pairwise import cosine_similarity
 from src.utils.TM_dataset import rating_of_movie
-import time
 
 
-def build_graph():
+def build_graph(credits_df):
     """
     to build a weighted bi-graph of directors and casts
     each weight is equal to average of the ratings of movies the cast and crew have involved in
     :return: a bi-graph
     """
-    credits_df = pd.read_csv(paths.the_movies_dataset + 'credits.csv', usecols=['id', 'cast', 'crew'])
-
-    credits_df = credits_df.sample(frac=0.25)  # TODO: remove this line for the final run
-    sampled_rows = []
-    for row_id, row in credits_df.iterrows():
-        sampled_rows.append(row_id)
-
-    with open('./sampled_rows.pkl', 'wb') as file:
-        pickle.dump(sampled_rows, file)
-
     director_set, cast_set = set(), set()
     director_name, cast_name = {}, {}
     edges_count, edges_sum_rate = defaultdict(int), defaultdict(float)
@@ -54,6 +39,7 @@ def build_graph():
             edges_count[(director_id, cast_id)] += 1
             edges_sum_rate[(director_id, cast_id)] += rating
 
+    # statistics about the movies dataset
     # print(len(director_set))  # 17698
     # print(len(cast_set))  # 205467
     # print(len(edges))  # 513485
@@ -70,7 +56,7 @@ def build_graph():
     return dir_cast_graph, director_set, cast_set, director_name, cast_name
 
 
-def predict_links(dir_cast_graph, director_set, cast_set):
+def predict_links(dir_cast_graph, director_set, cast_set, potentiality_threshold=0):
     cast_list = list(cast_set)  # mapping from cast_index to cast_id
     director_list = list(director_set)  # mapping from director_index to director_id
 
@@ -86,8 +72,7 @@ def predict_links(dir_cast_graph, director_set, cast_set):
             adjacency_matrix[director_index, cast_index] = weight
 
     similarities = cosine_similarity(adjacency_matrix, adjacency_matrix)
-    print('--similarities are calculated')
-    print("--- %s seconds from start---" % (time.time() - start_time))
+    print('--similarities are calculated between directors')
 
     director_cast_potentialities = []  # each element is a list [director_id, cast_id, potentiality]
 
@@ -108,38 +93,7 @@ def predict_links(dir_cast_graph, director_set, cast_set):
             director_id = director_list[director_idx_i]
             cast_id = cast_list[cast_idx]
             potentiality = cast_potentiality_i[cast_idx]
-            if potentiality > 0.001:  # TODO: change it to a better threshold
+            if potentiality > potentiality_threshold:
                 director_cast_potentialities.append([director_id, cast_id, potentiality])
 
-    with open('./potentialities_50perc.pkl', 'wb') as file:
-        pickle.dump(director_cast_potentialities, file)
-
-    # with open('./potentialities.pkl', 'rb') as file:
-    #     director_cast_potentialities = pickle.load(file)
-
-
-if __name__ == '__main__':
-    start_time = time.time()
-
-    # with open('./potentialities.pkl', 'rb') as file:
-    #     director_cast_potentialities = pickle.load(file)
-    # print(director_cast_potentialities)
-    # exit()
-    dir_cast_graph, director_set, cast_set, director_name, cast_name = build_graph()
-    print('--bi-graph has been built')
-    print("--- %s seconds from start---" % (time.time() - start_time))
-
-    predict_links(dir_cast_graph, director_set, cast_set)
-    print('--links are predicted')
-    print("--- %s seconds from start---" % (time.time() - start_time))
-
-    # pos = nx.bipartite_layout(dir_cast_graph, director_set)
-    # # get adjacency matrix
-    # A = nx.adjacency_matrix(dir_cast_graph)
-    # A = A.toarray()
-    # # plot adjacency matrix
-    # plt.imshow(A, cmap='Greys')
-    # plt.show()
-    # # plot graph visualisation
-    # nx.draw(dir_cast_graph, pos, with_labels=False)
-    # plt.show()
+    return director_cast_potentialities
