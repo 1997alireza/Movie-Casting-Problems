@@ -24,7 +24,7 @@ def get_network(actor_depth, coacting_count):
         movie_id = credits['id'][i]
         movie_rating = rating_of_movie(movie_id)
         for j in range(min(len(res), actor_depth)):
-            movie_cast.append(res[j]['name'])
+            movie_cast.append(res[j]['id'])
         edges = rSubset(movie_cast)
         for k in range(len(edges)):
             if actors_graph.has_edge(edges[k][0], edges[k][1]):
@@ -35,12 +35,14 @@ def get_network(actor_depth, coacting_count):
                 rating_sum = movie_rating
             actors_graph.add_edge(edges[k][0], edges[k][1],
                                   weight=common_count, rating=rating_sum)
-
     selected = [(u, v, d) for (u, v, d) in actors_graph.edges(data=True) if d['weight'] >= coacting_count]
     final_graph = nx.Graph()
     final_graph.add_edges_from(selected)
+    edges_list = []
     for u, v, d in final_graph.edges(data=True):
-        print(u, v, d)
+        edges_list.append((u, v, d))
+    return edges_list
 
 
-get_network(5, 2)
+print(get_network(5, 2))
+
