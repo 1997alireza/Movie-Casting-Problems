@@ -24,7 +24,7 @@ credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv')
 
 # creating graph based on co-acting
 MG = nx.Graph()
-for i in range(1000):
+for i in range(500):
     cast = credits['cast'][i]
     res = ast.literal_eval(cast)
     cast_mem = []

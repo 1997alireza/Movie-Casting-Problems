@@ -10,7 +10,7 @@ import random
 
 import paths
 
-df_size = 40
+df_size = 8
 
 movies = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', dtype='unicode')
 movies = pd.DataFrame(movies).set_index('id')[0:df_size].copy(deep=True)
@@ -32,7 +32,7 @@ def calculate_ids():
 
 
 def combined_features(row):
-    combined = row['adult'] + " " + row['original_language']
+    combined = row['adult'] + " " + row['original_language'] + " " + row['original_title']
     genres = ast.literal_eval(row['genres'])
     for genre in genres:
         combined = combined + " " + genre['name']
@@ -78,7 +78,10 @@ def get_similar(movie_title="Jumanji"):
 def prepare_graph():
     for i in range(df_size):
         movie = get_title_from_index(i)
-        MG.add_edge(movie, get_similar(movie))
+        if not MG.has_node(movie):
+            MG.add_node(movie, group='movie')
+            MG.add_node(get_similar(movie), group='movie')
+        MG.add_edge(movie, get_similar(movie), group='edge')
         print(movie + "  ->  " + get_similar(movie))
         cast = credits[credits.id == int(row_to_id[i])]['cast'][i]
         res = ast.literal_eval(cast)
@@ -89,7 +92,9 @@ def prepare_graph():
             cast_mem.append(res[j]['name'])
         all_cast.extend(cast_mem)
         for k in range(len(cast_mem)):
-            MG.add_edge(cast_mem[k], movie)
+            if not MG.has_node(cast_mem[k]):
+                MG.add_node(cast_mem[k], group='actor')
+            MG.add_edge(cast_mem[k], movie, group='edge')
 
 
 calculate_ids()
@@ -104,5 +109,5 @@ for actor in all_cast:
             if get_index_from_title(candid) == None:
                 result = result + ", " + candid
         print(actor + "  ?  " + result)
-
+print(MG)
 visualize(MG)
