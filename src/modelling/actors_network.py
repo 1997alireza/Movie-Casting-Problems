@@ -25,6 +25,16 @@ def get_network(actor_depth, coacting_count):
         movie_rating = rating_of_movie(movie_id)
         for j in range(min(len(res), actor_depth)):
             movie_cast.append(res[j]['id'])
+        for actor_id in movie_cast:
+            if actors_graph.has_edge(actor_id, actor_id):
+                common_count = actors_graph[actor_id][actor_id]["weight"] + 1
+                rating_sum = actors_graph[actor_id][actor_id]["rating"] + movie_rating
+            else:
+                common_count = 1
+                rating_sum = movie_rating
+            actors_graph.add_edge(actor_id, actor_id,
+                                  weight=common_count, rating=rating_sum)
+
         edges = rSubset(movie_cast)
         for k in range(len(edges)):
             if actors_graph.has_edge(edges[k][0], edges[k][1]):
