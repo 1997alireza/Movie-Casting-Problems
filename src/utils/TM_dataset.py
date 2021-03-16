@@ -12,7 +12,7 @@ __ratings_df = pd.read_csv(paths.the_movies_dataset + 'ratings.csv', usecols=['m
 def rating_of_movie(tmdb_id):
     """
     ratings.movieId = links.movieId; so we need to find the related moveId for the input tmdbId using links data
-    :param tmdb_id: based in the dataset it's equal to links.tmdbId or movies_metadata.id
+    :param tmdb_id: based in the dataset it's equal to links.tmdbId or movies_metadata.id, and credits.id as well
     :return: the average of the ratings. if there is not any rating available for that movie, it returns NaN
     """
     global __links_df, __ratings_df
