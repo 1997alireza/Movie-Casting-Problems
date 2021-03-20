@@ -6,7 +6,7 @@ using only latent features learned from local graph topology.
 
 Usage: python train_reconstruction.py <dataset_str> <gpu_id>
 """
-
+# TODO: remove file
 import sys
 # if len(sys.argv) < 3:
 #     print('\nUSAGE: python %s <dataset_str> <gpu_id>' % sys.argv[0])

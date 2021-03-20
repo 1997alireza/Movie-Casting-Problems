@@ -12,6 +12,7 @@ __credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv')
 
 def get_network(actor_depth=5, coacting_count_threshold=2):
     """
+    generating the undirected actors graph
     each edge has three values:
     {count: number of common movies, rating_sum: sum of common movies' ratings, weight=rating_sum/common_count/5}
     the edge's weight would be in the range [0, 1]
@@ -21,7 +22,7 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
     :return:
     """
     sample_size = 1000  # TODO: it's for test, remove it
-    sample_size = len(__credits)  # TODO
+    # sample_size = len(__credits)  # TODO
 
     actors_graph = nx.Graph()
     for i in range(sample_size):
@@ -33,7 +34,19 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
         for j in range(min(len(res), actor_depth)):
             movie_cast.append(res[j]['id'])
 
-        edges = list(combinations(movie_cast, 2))  # extracting subsets with length equal to 2
+        # self-connection edges
+        for actor_id in movie_cast:
+            if actors_graph.has_edge(actor_id, actor_id):
+                common_count = actors_graph[actor_id][actor_id]['count'] + 1
+                rating_sum = actors_graph[actor_id][actor_id]['rating_sum'] + movie_rating
+            else:
+                common_count = 1
+                rating_sum = movie_rating
+
+            actors_graph.add_edge(actor_id, actor_id,
+                                  count=common_count, rating_sum=rating_sum, weight=rating_sum/common_count/5)
+
+        edges = list(combinations(movie_cast, 2))  # extracting subsets with length equals to 2
 
         for k in range(len(edges)):
             if actors_graph.has_edge(edges[k][0], edges[k][1]):
@@ -43,7 +56,6 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
                 common_count = 1
                 rating_sum = movie_rating
 
-            # update the edge's data
             actors_graph.add_edge(edges[k][0], edges[k][1],
                                   count=common_count, rating_sum=rating_sum, weight=rating_sum/common_count/5)
 

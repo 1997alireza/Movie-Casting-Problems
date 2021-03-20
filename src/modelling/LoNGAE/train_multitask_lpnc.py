@@ -8,7 +8,7 @@ explicit node features. The following datasets are supported:
 
 Usage: python train_multitask_lpnc.py <dataset_str> <gpu_id>
 """
-
+# TODO: remove file
 import sys
 
 # if len(sys.argv) < 3:

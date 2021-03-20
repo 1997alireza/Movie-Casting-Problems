@@ -128,7 +128,9 @@ def split_citation_data(adj):
     """
 
     # Remove diagonal elements
+    print(adj)
     adj = adj - sp.dia_matrix((adj.diagonal()[np.newaxis, :], [0]), shape=adj.shape)
+    print(adj)
     adj.eliminate_zeros()
     # Check that diag is zero:
     assert np.diag(adj.todense()).sum() == 0
@@ -200,3 +202,8 @@ def split_citation_data(adj):
     # NOTE: the edge list only contains single direction of edge!
     return np.concatenate([test_edges, np.asarray(test_edges_false)], axis=0)
 
+
+if __name__ == '__main__':
+    adj = [[0.5,0,1.], [1,0.1, 1], [0.2,0.2,0.2]]
+    nx.adjacency_matrix
+    split_citation_data(adj)

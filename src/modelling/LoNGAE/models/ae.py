@@ -131,9 +131,9 @@ def autoencoder(dataset, adj, weights=None):
     return encoder, autoencoder
 
 
-def autoencoder_with_node_features(adj, feats, weights=None):
-    aug_adj = sp.hstack([adj, feats])
-    h, w = aug_adj.shape
+def autoencoder_with_node_features(adj_row_length, features_length, weights=None):
+    h = adj_row_length
+    w = adj_row_length + features_length
 
     kwargs = dict(
         use_bias=True,
@@ -189,11 +189,11 @@ def autoencoder_with_node_features(adj, feats, weights=None):
     # datasets with mixture of binary and real features
 
     # output related to node features
-    decoded_feats = Lambda(lambda x: x[:, adj.shape[1]:],
+    decoded_feats = Lambda(lambda x: x[:, h:],
                         name='decoded_feats')(decoded)
 
     # output related to adjacency
-    decoded = Lambda(lambda x: x[:, :adj.shape[1]],
+    decoded = Lambda(lambda x: x[:, :h],
                         name='decoded')(decoded)
 
     autoencoder = Model(

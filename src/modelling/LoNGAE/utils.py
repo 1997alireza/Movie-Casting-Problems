@@ -22,7 +22,7 @@ def generate_data(adj, adj_train, feats, labels, mask, shuffle=True):
 
 
 def batch_data(data, batch_size):
-    while True: # this flag yields an infinite generator
+    while True:  # this flag yields an infinite generator
         a, t, f, y, m = zip(*[next(data) for i in range(batch_size)])
         a = np.vstack(a)
         t = np.vstack(t)
