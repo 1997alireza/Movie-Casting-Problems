@@ -7,18 +7,15 @@ from itertools import combinations
 np.random.seed(1982)
 
 
-def generate_data(adj, adj_train, feats, labels, mask, shuffle=True):
-    adj = adj.tocsr()
-    adj_train = adj_train.tocsr()
-    feats = feats.tocsr()
-    zipped = list(zip(adj, adj_train, feats, labels, mask))
+def generate_data(aug_adj, adj_train, feats, labels, mask, shuffle=True):
+    zipped = list(zip(aug_adj, adj_train, feats, labels, mask))
     while True:  # this flag yields an infinite generator
         if shuffle:
             print('Shuffling data')
             np.random.shuffle(zipped)
         for data in zipped:
             a, t, f, y, m = data
-            yield (a.toarray(), t.toarray(), f.toarray(), y, m)
+            yield (a, t, f, y, m)
 
 
 def batch_data(data, batch_size):

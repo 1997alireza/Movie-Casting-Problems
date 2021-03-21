@@ -26,8 +26,9 @@ def build_graph(credits_df):
         except StopIteration:  # when it cannot find the director in the crew list
             continue
 
-        rating = rating_of_movie(row.id)
-        if np.isnan(rating):  # TODO: or should I create the edge with some weight?
+        try:
+            rating = rating_of_movie(row.id)
+        except Exception:
             continue
 
         casts = eval(row.cast)

@@ -55,10 +55,10 @@ def load_citation_data(dataset_str):  #TODO: clear
     # print(len(graph))
     # print(graph[1])
 
-    print(x.shape)
-    print(y.shape)
-    print(allx.shape)
-    print(ally.shape)
+    # print(x.shape)
+    # print(y.shape)
+    # print(allx.shape)
+    # print(ally.shape)
 
     # print(tx.shape)
     # print(ty.shape)
@@ -108,7 +108,7 @@ def load_citation_data(dataset_str):  #TODO: clear
     # Adj and features matrices are in scipy sparse linked list format.
     # Other matrices are in numpy array format
     return adj.tolil(), features, y_train, y_val, y_test, train_mask, val_mask, test_mask
-    
+
 
 def sparse_to_tuple(sparse_mx):
     if not sp.isspmatrix_coo(sparse_mx):
@@ -128,10 +128,10 @@ def split_citation_data(adj):
     """
 
     # Remove diagonal elements
-    print(adj)
+
+    adj = sp.csr_matrix(adj)
     adj = adj - sp.dia_matrix((adj.diagonal()[np.newaxis, :], [0]), shape=adj.shape)
-    print(adj)
-    adj.eliminate_zeros()
+
     # Check that diag is zero:
     assert np.diag(adj.todense()).sum() == 0
 
@@ -197,13 +197,7 @@ def split_citation_data(adj):
     assert ~ismember(test_edges, train_edges)
     assert ~ismember(val_edges, test_edges)
 
-    data = np.ones(train_edges.shape[0])
+    # data = np.ones(train_edges.shape[0])
 
     # NOTE: the edge list only contains single direction of edge!
     return np.concatenate([test_edges, np.asarray(test_edges_false)], axis=0)
-
-
-if __name__ == '__main__':
-    adj = [[0.5,0,1.], [1,0.1, 1], [0.2,0.2,0.2]]
-    nx.adjacency_matrix
-    split_citation_data(adj)

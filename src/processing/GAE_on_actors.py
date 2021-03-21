@@ -6,13 +6,11 @@ Using the graph autoencoder LoNGAE on our actors network. Goals:
 """
 
 from src.modelling.actors_network import get_network
-from src.utils.TM_dataset import actor_rating_genre_based
-import numpy as np
+from src.utils.TM_dataset import actors_rating_genre_based
 from src.modelling.LoNGAE.train_lp_with_feats import run
 
 
 if __name__ == '__main__':
     actors_adjacency, actors_id = get_network()
-    actors_feature = [actor_rating_genre_based(a_id) for a_id in actors_id]
-    actors_feature = np.array(actors_feature)
-    run(actors_adjacency, actors_feature)
+    actors_feature = actors_rating_genre_based(actors_id)
+    run(actors_adjacency, actors_feature, evaluate_lp=True)

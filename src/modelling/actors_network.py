@@ -4,7 +4,7 @@ import ast
 from itertools import combinations
 
 import paths
-from src.utils.TM_dataset import rating_of_movie
+from src.utils.TM_dataset import rating_of_movie, in_top_genres
 
 pd.set_option('display.max_colwidth', None)
 __credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv')
@@ -21,16 +21,24 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
     :param coacting_count_threshold: if two actors have at least coacting_count_threshold common movies they would have an edge
     :return:
     """
-    sample_size = 1000  # TODO: it's for test, remove it
-    # sample_size = len(__credits)  # TODO
+    # sample_size = 5000  # TODO: it's for test, remove it
+    sample_size = len(__credits)  # TODO
 
     actors_graph = nx.Graph()
     for i in range(sample_size):
+        movie_id = __credits['id'][i]
+        if not in_top_genres(movie_id):
+            continue
+
         cast = __credits['cast'][i]
         res = ast.literal_eval(cast)
         movie_cast = []
-        movie_id = __credits['id'][i]
-        movie_rating = rating_of_movie(movie_id)
+
+        try:
+            movie_rating = rating_of_movie(movie_id)
+        except Exception:  # no rating has been found for the movie
+            continue
+
         for j in range(min(len(res), actor_depth)):
             movie_cast.append(res[j]['id'])
 
@@ -67,4 +75,7 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
     # edges_list = []
     # for u, v, d in final_graph.edges(data=True):
     #     edges_list.append((u, v, d))
-    return nx.adjacency_matrix(final_graph), actors_graph.nodes
+
+    print('Actors network has been created with {} nodes and {} edges.'.format(
+        final_graph.number_of_nodes(), final_graph.number_of_edges()))
+    return nx.adjacency_matrix(final_graph).toarray(), list(actors_graph.nodes)
