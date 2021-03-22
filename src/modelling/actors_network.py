@@ -7,7 +7,7 @@ import paths
 from src.utils.TM_dataset import rating_of_movie, in_top_genres
 
 pd.set_option('display.max_colwidth', None)
-__credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv')
+__credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv', usecols=['id', 'cast'])
 __movies = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', usecols=['id', 'vote_average'])
 
 
