@@ -8,6 +8,22 @@ from src.utils.TM_dataset import rating_of_movie, in_top_genres
 
 pd.set_option('display.max_colwidth', None)
 __credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv')
+__movies = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', usecols=['id', 'vote_average'])
+
+
+def ratings_stats():
+    notrated_count = 0
+    rated_count = 0
+    for i in range(__movies.shape[0]):
+        movie_id = __credits['id'][i]
+        try:
+            rating = __movies[__movies['id'] == str(movie_id)]
+            rated_count += 1
+        except Exception:  # no rating has been found for the movie
+            notrated_count += 1
+            continue
+    print("rated: " + str(rated_count))
+    print("not rated: " + str(notrated_count))
 
 
 def get_network(actor_depth=5, coacting_count_threshold=2):
@@ -35,7 +51,7 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
         movie_cast = []
 
         try:
-            movie_rating = rating_of_movie(movie_id)
+            movie_rating = rating = __movies[__movies['id'] == str(movie_id)]
         except Exception:  # no rating has been found for the movie
             continue
 
@@ -52,7 +68,7 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
                 rating_sum = movie_rating
 
             actors_graph.add_edge(actor_id, actor_id,
-                                  count=common_count, rating_sum=rating_sum, weight=rating_sum/common_count/5)
+                                  count=common_count, rating_sum=rating_sum, weight=rating_sum / common_count / 5)
 
         edges = list(combinations(movie_cast, 2))  # extracting subsets with length equals to 2
 
@@ -65,7 +81,7 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
                 rating_sum = movie_rating
 
             actors_graph.add_edge(edges[k][0], edges[k][1],
-                                  count=common_count, rating_sum=rating_sum, weight=rating_sum/common_count/5)
+                                  count=common_count, rating_sum=rating_sum, weight=rating_sum / common_count / 5)
 
     selected = [(u, v, d) for (u, v, d) in actors_graph.edges(data=True) if d['count'] >= coacting_count_threshold]
 
