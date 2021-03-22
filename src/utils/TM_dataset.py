@@ -10,7 +10,7 @@ from sklearn.preprocessing import normalize
 __links_df = pd.read_csv(paths.the_movies_dataset + 'links.csv', usecols=['tmdbId', 'movieId'])
 __ratings_df = pd.read_csv(paths.the_movies_dataset + 'ratings.csv', usecols=['movieId', 'rating'])
 __credits = pd.read_csv(paths.the_movies_dataset + 'credits.csv', usecols=['id', 'cast'])  # this id is tmdb_id
-__movies = pd.read_csv(paths.the_movies_dataset + 'movies_metadata.csv', usecols=['id', 'genres'])  # this id is tmdb_id
+__movies = pd.read_csv(paths.the_movies_dataset + 'movies_metadata.csv', usecols=['id', 'genres', 'vote_average'])  # this id is tmdb_id
 
 
 # list of the genres with high number of movies in the movies dataset
@@ -19,23 +19,40 @@ __top_genres_list = ['Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror
                      'War', 'Western', 'TV Movie']
 
 
+# def rating_of_movie(tmdb_id):
+#     """
+#     ratings.movieId = links.movieId; so we need to find the related moveId for the input tmdbId using links data
+#     :param tmdb_id: it's equal to links.tmdbId or movies_metadata.id, and credits.id as well
+#     :return: the average of the ratings. if there is not any rating available for that movie, it returns NaN
+#     """
+#     global __links_df, __ratings_df
+#
+#     try:
+#         movie_id = __links_df[__links_df.tmdbId == tmdb_id].iloc[0].movieId
+#     except IndexError:
+#         raise Exception('tmdb id {} is not found'.format(tmdb_id))
+#     ratings = __ratings_df[__ratings_df.movieId == movie_id].rating
+#     if len(ratings):
+#         raise Exception('no rating has been found for the movie {}'.format(tmdb_id))
+#
+#     return __ratings_df[__ratings_df.movieId == movie_id].rating.mean()
+
+
 def rating_of_movie(tmdb_id):
     """
-    ratings.movieId = links.movieId; so we need to find the related moveId for the input tmdbId using links data
-    :param tmdb_id: it's equal to links.tmdbId or movies_metadata.id, and credits.id as well
-    :return: the average of the ratings. if there is not any rating available for that movie, it returns NaN
+
+    :param tmdb_id: an integer which is equal to links.tmdbId or movies_metadata.id, and credits.id as well
+    :return: normalized average vote (movies_metadata.vote_average/10)
     """
-    global __links_df, __ratings_df
-
+    global __movies
     try:
-        movie_id = __links_df[__links_df.tmdbId == tmdb_id].iloc[0].movieId
-    except IndexError:
-        raise Exception('tmdb id {} is not found'.format(tmdb_id))
-    ratings = __ratings_df[__ratings_df.movieId == movie_id].rating
-    if len(ratings):
-        raise Exception('no rating has been found for movie {}'.format(tmdb_id))
-
-    return __ratings_df[__ratings_df.movieId == movie_id].rating.mean()
+        normalized_rating = __movies[__movies['id'] == str(tmdb_id)].iloc[0]['vote_average'] / 10
+        if normalized_rating == 0.0:
+            raise Exception('the movie {} is not rated'.format(tmdb_id))
+        else:
+            return normalized_rating
+    except Exception:
+        raise Exception('the movie {} is not rated'.format(tmdb_id))
 
 
 def genres_of_movie(tmdb_id):
@@ -120,7 +137,7 @@ def actors_rating_genre_based(actor_ids):
 
         try:
             movie_rating = rating_of_movie(movie_id)
-        except Exception:  # no rating has been found for the movie
+        except Exception:  # no rating has been found for this movie
             continue
 
         casts_id = [c['id'] for c in eval(__credits['cast'][i])]
