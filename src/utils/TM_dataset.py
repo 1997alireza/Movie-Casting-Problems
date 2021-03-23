@@ -6,6 +6,7 @@ import pandas as pd
 import paths
 import numpy as np
 from sklearn.preprocessing import normalize
+from math import isnan
 
 __links_df = pd.read_csv(paths.the_movies_dataset + 'links.csv', usecols=['tmdbId', 'movieId'])
 __ratings_df = pd.read_csv(paths.the_movies_dataset + 'ratings.csv', usecols=['movieId', 'rating'])
@@ -47,12 +48,14 @@ def rating_of_movie(tmdb_id):
     global __movies
     try:
         normalized_rating = __movies[__movies['id'] == str(tmdb_id)].iloc[0]['vote_average'] / 10
-        if normalized_rating == 0.0:
+        if normalized_rating == 0.0 or isnan(normalized_rating):
             raise Exception('the movie {} is not rated'.format(tmdb_id))
         else:
             return normalized_rating
     except Exception:
         raise Exception('the movie {} is not rated'.format(tmdb_id))
+
+    # TODO: why the extracted vote_average value for movie tmdb_id=82663 is NaN, however it seems that it has a float value in the dataset
 
 
 def genres_of_movie(tmdb_id):
@@ -149,5 +152,5 @@ def actors_rating_genre_based(actor_ids):
 
             features[a_idx][genres_idx] += movie_rating
 
-    print('Actors features are extracted.')
+    print('Actors features are extracted')
     return normalize(features)

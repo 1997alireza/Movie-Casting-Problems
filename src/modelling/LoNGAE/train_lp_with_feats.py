@@ -22,10 +22,11 @@ from sklearn.metrics import roc_auc_score as auc_score
 from sklearn.metrics import average_precision_score as ap_score
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler
 
-from src.utils.mathematical import cosine_similarity
+from src.utils.mathematical import cosine_similarity, euclidean_distance
 from .utils import generate_data, batch_data
 from .utils_gcn import load_citation_data, split_citation_data
 from .models.ae import autoencoder_with_node_features
+import paths
 
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
@@ -54,7 +55,7 @@ def run(adj, feats, evaluate_lp=False):
         print('\nPreparing test split...\n')
         test_inds = split_citation_data(adj)
 
-        test_inds = np.vstack({tuple(row) for row in test_inds})
+        test_inds = np.vstack(list({tuple(row) for row in test_inds}))
 
         test_r = test_inds[:, 0]
         test_c = test_inds[:, 1]
@@ -77,9 +78,9 @@ def run(adj, feats, evaluate_lp=False):
 
     encoder, ae = autoencoder_with_node_features(adj.shape[1], feats.shape[1])
 
-    aug_adj = np.hstack((adj, feats))
-
     print(ae.summary())
+
+    aug_adj = np.hstack((adj, feats))
 
     # Specify some hyperparameters
     epochs = 50
@@ -112,8 +113,8 @@ def run(adj, feats, evaluate_lp=False):
         train_loss = np.mean(train_loss, axis=0)
         print('Avg. training loss: {:s}'.format(str(train_loss)))
 
-        encoder.save('encoder.model')
-        ae.save('autoencoder.model')
+        encoder.save(paths.models + 'actors_graph_ae/encoder.keras')
+        ae.save(paths.models + 'actors_graph_ae/autoencoder.keras')
         print('\nTrained model is saved.')
 
         if evaluate_lp:
@@ -130,9 +131,10 @@ def run(adj, feats, evaluate_lp=False):
             decoded_lp = np.vstack(outputs)
             predictions.extend(decoded_lp[test_r, test_c])
             predictions.extend(decoded_lp[test_c, test_r])
-            print('Val AUC: {:6f}'.format(auc_score(labels, predictions)))
-            print('Val AP: {:6f}'.format(ap_score(labels, predictions)))
+            # print('Val AUC: {:6f}'.format(auc_score(labels, predictions)))  # continuous format is not supported
+            # print('Val AP: {:6f}'.format(ap_score(labels, predictions)))  # continuous format is not supported
             print('Val CosineSim: {:6f}'.format(cosine_similarity(labels, predictions)))
+            print('Val EuclideanDist: {:6f}'.format(euclidean_distance(labels, predictions)))
     print('\nAll done.')
 
 

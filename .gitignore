@@ -5,6 +5,7 @@ __pycache__
 test/
 venv/
 datasets/
+models/
 temporal_data/
 
 *.png

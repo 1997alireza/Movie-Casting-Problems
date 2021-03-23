@@ -2,7 +2,6 @@ import pandas as pd
 import networkx as nx
 import ast
 from itertools import combinations
-
 import paths
 from src.utils.TM_dataset import rating_of_movie, in_top_genres
 
@@ -11,7 +10,7 @@ __credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv', usecols=['id'
 __movies = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', usecols=['id', 'vote_average'])
 
 
-def get_network(actor_depth=5, coacting_count_threshold=2):
+def get_network(actor_depth, coacting_count_threshold):
     """
     generating the undirected actors graph
     each edge has three values:
@@ -23,7 +22,7 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
     :param coacting_count_threshold: if two actors have at least coacting_count_threshold common movies they would have an edge
     :return:
     """
-    # sample_size = 5000  # TODO: it's for test, remove it
+    # sample_size = 100  # TODO: it's for test, remove it
     sample_size = len(__credits)  # TODO
 
     actors_graph = nx.Graph()
@@ -78,6 +77,7 @@ def get_network(actor_depth=5, coacting_count_threshold=2):
     # for u, v, d in final_graph.edges(data=True):
     #     edges_list.append((u, v, d))
 
-    print('Actors network has been created with {} nodes and {} edges.'.format(
+    print('Actors network has been created with {} nodes and {} edges'.format(
         final_graph.number_of_nodes(), final_graph.number_of_edges()))
-    return nx.adjacency_matrix(final_graph).toarray(), list(actors_graph.nodes)
+
+    return final_graph

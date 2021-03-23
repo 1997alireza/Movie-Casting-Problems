@@ -4,6 +4,10 @@ statistics about the movies dataset
 print(len(director_set))  # 17698
 print(len(cast_set))  # 205467
 print(len(edges))  # 513485
+
+Actors network:
+when training the whole dataset with actor_depth=5, coacting_count_threshold=2:
+Actors network has been created with 24121 nodes and 38022 edges.
 """
 
 import pandas as pd
@@ -28,5 +32,4 @@ def ratings_stats():
             continue
     print("rated: " + str(rated_count))  # 45476
     print("not rated: " + str(notrated_count))  # 0
-
 
