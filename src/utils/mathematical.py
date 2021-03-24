@@ -8,7 +8,9 @@ def cosine_similarity(a, b):
 
 
 def euclidean_distance(a, b):
-    a = np.array(a)
-    b = np.array(b)
     return norm(a - b)
+
+
+def MSE(a, b):
+    return np.sum((a-b)**2) / len(a)
 

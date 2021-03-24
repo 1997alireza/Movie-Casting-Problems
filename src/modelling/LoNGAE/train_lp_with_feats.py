@@ -8,35 +8,27 @@ and available node features. The following datasets have node features:
 Usage: python train_lp_with_feats.py <dataset_str> <gpu_id>
 """
 
-# import sys
-
-# if len(sys.argv) < 3:
-#     print('\nUSAGE: python %s <dataset_str> <gpu_id>' % sys.argv[0])
-#     sys.exit()
-gpu_id = 0
-
 import numpy as np
-import scipy.sparse as sp
 from keras import backend as K
-from sklearn.metrics import roc_auc_score as auc_score
-from sklearn.metrics import average_precision_score as ap_score
-from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler
+from sklearn.preprocessing import MaxAbsScaler
 
-from src.utils.mathematical import cosine_similarity, euclidean_distance
+from src.utils.mathematical import MSE, euclidean_distance
 from .utils import generate_data, batch_data
-from .utils_gcn import load_citation_data, split_citation_data
+from .utils_gcn import split_adjacency_data
 from .models.ae import autoencoder_with_node_features
 import paths
 
 import os
+gpu_id = 0
 os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
 
 
-def run(adj, feats, evaluate_lp=False):
+def run(adj, feats, node_features_weight, evaluate_lp=False):
     """
 
     :param adj: adjacency matrix as a 2d numpy array
     :param feats: node features as a 2d numpy array
+    :param node_features_weight: balancing weights for node features as a 1d numpy array
     :param evaluate_lp: if it's True, the evaluation on link prediction task is done.
     (if the evaluation is being done, the model would not be trained on all of the provided data)
     :return:
@@ -53,17 +45,16 @@ def run(adj, feats, evaluate_lp=False):
 
     if evaluate_lp:
         print('\nPreparing test split...\n')
-        test_inds = split_citation_data(adj)
-
+        test_inds = split_adjacency_data(adj)
         test_inds = np.vstack(list({tuple(row) for row in test_inds}))
 
         test_r = test_inds[:, 0]
         test_c = test_inds[:, 1]
         # Collect edge labels for evaluation
         # NOTE: matrix is undirected and symmetric
-        labels = []
-        labels.extend(np.squeeze(adj[test_r, test_c]))
-        labels.extend(np.squeeze(adj[test_c, test_r]))
+        labels = np.concatenate((np.squeeze(adj[test_r, test_c]), np.squeeze(adj[test_c, test_r])))
+        non_zero_labels_idx = labels.nonzero()[0]
+
         # Mask test edges as missing with -1.0 values
         train[test_r, test_c] = -1.0
         train[test_c, test_r] = -1.0
@@ -76,7 +67,7 @@ def run(adj, feats, evaluate_lp=False):
 
     print('\nCompiling autoencoder model...\n')
 
-    encoder, ae = autoencoder_with_node_features(adj.shape[1], feats.shape[1])
+    encoder, ae = autoencoder_with_node_features(adj.shape[1], feats.shape[1], node_features_weight)
 
     print(ae.summary())
 
@@ -88,11 +79,8 @@ def run(adj, feats, evaluate_lp=False):
     val_batch_size = 256
 
     print('\nFitting autoencoder model...\n')
-    dummy = np.empty(shape=(aug_adj.shape[0], 1))
-    y_true = dummy.copy()
-    mask = dummy.copy()  # TODO: remove dummies
 
-    training_data = generate_data(aug_adj, train, feats, y_true, mask, shuffle=True)
+    training_data = generate_data(aug_adj, train, feats, shuffle=True)
     b_data = batch_data(training_data, train_batch_size)
     num_iters_per_train_epoch = aug_adj.shape[0] / train_batch_size
     for e in range(epochs):
@@ -100,7 +88,7 @@ def run(adj, feats, evaluate_lp=False):
         print('Learning rate: {:6f}'.format(K.eval(ae.optimizer.lr)))
         curr_iter = 0
         train_loss = []
-        for batch_aug_adj, batch_train, batch_f, dummy_y, dummy_m in b_data:
+        for batch_aug_adj, batch_train, batch_f in b_data:
             # Each iteration/loop is a batch of train_batch_size samples
             loss = ae.train_on_batch([batch_aug_adj], [batch_train, batch_f])
             total_loss = loss[0]  # when we have multiple losses
@@ -131,19 +119,13 @@ def run(adj, feats, evaluate_lp=False):
             decoded_lp = np.vstack(outputs)
             predictions.extend(decoded_lp[test_r, test_c])
             predictions.extend(decoded_lp[test_c, test_r])
+            predictions = np.array(predictions)
             # print('Val AUC: {:6f}'.format(auc_score(labels, predictions)))  # continuous format is not supported
             # print('Val AP: {:6f}'.format(ap_score(labels, predictions)))  # continuous format is not supported
-            print('Val CosineSim: {:6f}'.format(cosine_similarity(labels, predictions)))
-            print('Val EuclideanDist: {:6f}'.format(euclidean_distance(labels, predictions)))
+            # print('Val EuclideanDist: {:6f}'.format(euclidean_distance(labels, predictions)))
+            # print('Link prediction val (even on links with weight zero) MSE: {:6f}'.format(MSE(labels, predictions)))
+
+            print(list(zip(predictions[non_zero_labels_idx] * 10, labels[non_zero_labels_idx] * 10)))
+            print('Link prediction val MSE: {:6f}'.format(MSE(labels[non_zero_labels_idx], predictions[non_zero_labels_idx])))
+
     print('\nAll done.')
-
-
-if __name__ == '__main__':
-    dataset = 'citeseer'
-    print('\nLoading dataset {:s}...\n'.format(dataset))
-    adj, feats, _, _, _, _, _, _ = load_citation_data(dataset)
-
-    adj = adj.toarray()
-    feats = feats.toarray()
-
-    run(adj, feats, True)

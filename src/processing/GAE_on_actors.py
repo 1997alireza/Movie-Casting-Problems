@@ -7,6 +7,7 @@ Using the graph autoencoder LoNGAE on our actors network. Goals:
 
 from src.modelling.LoNGAE.train_lp_with_feats import run
 from src.processing.actors_network_features import get_actors_network_features
+from src.utils.TM_dataset import actors_feature_balancing_weight
 from datetime import datetime
 import numpy as np
 import paths
@@ -16,10 +17,11 @@ from tensorflow import keras
 def train():
     time_zero = datetime.now()
     actors_adjacency, actors_feature, actors_id = get_actors_network_features()
+    node_features_weight = actors_feature_balancing_weight()
     print('delta T: ', datetime.now() - time_zero)
     time_zero = datetime.now()
 
-    run(actors_adjacency, actors_feature, evaluate_lp=True)
+    run(actors_adjacency, actors_feature, node_features_weight, evaluate_lp=True)
     print('delta T: ', datetime.now() - time_zero)
 
 
@@ -64,7 +66,8 @@ def get_latent_vector_generator():
 
 
 if __name__ == '__main__':
+    train()
+    exit()
     latent_vector_generator, actors_id = get_latent_vector_generator()
     print(actors_id)
     print(latent_vector_generator(actors_id[0]))
-

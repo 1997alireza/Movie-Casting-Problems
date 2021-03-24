@@ -24,7 +24,7 @@ from sklearn.preprocessing import MaxAbsScaler
 from sklearn.metrics import roc_auc_score as auc_score
 from sklearn.metrics import average_precision_score as ap_score
 
-from .utils_gcn import load_citation_data, split_citation_data
+from .utils_gcn import load_citation_data, split_adjacency_data
 from .utils import generate_data, batch_data
 from .utils import compute_masked_accuracy
 from .models.ae import autoencoder_multitask
@@ -41,7 +41,7 @@ except IOError:
 feats = MaxAbsScaler().fit_transform(feats).tolil()
 train = adj.copy()
 
-test_inds = split_citation_data(adj)
+test_inds = split_adjacency_data(adj)
 test_inds = np.vstack(list({tuple(row) for row in test_inds}))
 
 test_r = test_inds[:, 0]

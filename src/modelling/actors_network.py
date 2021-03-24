@@ -22,11 +22,8 @@ def get_network(actor_depth, coacting_count_threshold):
     :param coacting_count_threshold: if two actors have at least coacting_count_threshold common movies they would have an edge
     :return:
     """
-    # sample_size = 100  # TODO: it's for test, remove it
-    sample_size = len(__credits)  # TODO
-
     actors_graph = nx.Graph()
-    for i in range(sample_size):
+    for i in range(len(__credits)):
         movie_id = __credits['id'][i]
         if not in_top_genres(movie_id):
             continue

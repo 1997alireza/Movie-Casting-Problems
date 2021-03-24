@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
-from keras.layers import Input, Dense, Dropout, Lambda, add
+from keras.layers import Input, Dense, Dropout, Lambda, add, Softmax, Activation
 from keras.models import Model
 from keras import optimizers
 from keras import backend as K
@@ -68,7 +68,31 @@ def masked_categorical_crossentropy(y_true, y_pred):
     loss *= mask
     return K.mean(loss, axis=-1)
 
-    
+
+def masked_mean_squared_error(y_true, y_pred):
+    """ Mean Squared Error with masking """
+    mask = K.not_equal(y_true, 0.0)  # ignoring edges with weight equals to zero (means there is no edge yet)
+    mask = K.cast(mask, dtype=np.float32)
+
+    mask2 = K.not_equal(y_true, -1.0)  # ignoring deleted edges based on validation set
+    mask2 = K.cast(mask2, dtype=np.float32)
+
+    err = y_true - y_pred
+    masked_squared_err = K.square(err) * mask * mask2
+    return K.mean(masked_squared_err, axis=-1)
+
+
+def create_weighted_cosine_similarity(weights):
+    """ It returns a Cosine Similarity loss with a balancing weight on features """
+    def weighted_cosine_similarity(y_true, y_pred):
+        inner_prod = K.sum(y_true * y_pred * weights, axis=-1)
+        y_true_norm = K.sum(y_true * y_true * weights, axis=-1)
+        y_pred_norm = K.sum(y_pred * y_pred * weights, axis=-1)
+        return inner_prod / (K.sqrt(y_true_norm) * K.sqrt(y_pred_norm))
+
+    return weighted_cosine_similarity
+
+
 def autoencoder(dataset, adj, weights=None):
     h, w = adj.shape
     sparse_net = dataset in ['conflict', 'metabolic', 'protein']
@@ -131,7 +155,7 @@ def autoencoder(dataset, adj, weights=None):
     return encoder, autoencoder
 
 
-def autoencoder_with_node_features(adj_row_length, features_length, weights=None):
+def autoencoder_with_node_features(adj_row_length, features_length, node_features_weight, weights=None):
     h = adj_row_length
     w = adj_row_length + features_length
 
@@ -146,16 +170,7 @@ def autoencoder_with_node_features(adj_row_length, features_length, weights=None
 
     data = Input(shape=(w,), dtype=np.float32, name='data')
 
-
-    # TODO: ?
     noisy_data = Dropout(rate=0.5, name='drop1')(data)
-
-    # if dataset in ['protein', 'cora', 'citeseer', 'pubmed']:
-    #     # dropout 0.5 is needed for protein and citation (large nets)
-    #     noisy_data = Dropout(rate=0.5, name='drop1')(data)
-    # else:
-    #     # dropout 0.2 is needed for conflict and metabolic (small nets)
-    #     noisy_data = Dropout(rate=0.2, name='drop1')(data)
 
        
     ### First set of encoding transformation ###
@@ -182,29 +197,32 @@ def autoencoder_with_node_features(adj_row_length, features_length, weights=None
     ### Second set of decoding transformation - reconstruction ###
     decoded = DenseTied(w, tie_to=encoded1, transpose=True,
             activation='linear', name='decoded1')(decoded)
-    
-    # compile the autoencoder
-    adam = optimizers.Adam(lr=0.001, decay=0.0)
-    # if dataset in ['metabolic', 'conflict']:
-    # datasets with mixture of binary and real features
 
     # output related to node features
-    decoded_feats = Lambda(lambda x: x[:, h:],
-                        name='decoded_feats')(decoded)
+    decoded_feats_logits = Lambda(lambda x: x[:, h:],
+                        name='decoded_feats_logits')(decoded)
+
+    decoded_feats = Softmax(name='decoded_feats')(decoded_feats_logits)
 
     # output related to adjacency
-    decoded = Lambda(lambda x: x[:, :h],
-                        name='decoded')(decoded)
+    decoded_adj_logits = Lambda(lambda x: x[:, :h],
+                        name='decoded_adj_logits')(decoded)
+
+    decoded_adj = Activation(activation='sigmoid', name='decoded_adj')(decoded_adj_logits)
 
     autoencoder = Model(
-            inputs=[data], outputs=[decoded, decoded_feats]
-    )
-    autoencoder.compile(
-            optimizer=adam,
-            loss={'decoded': masked_ce, 'decoded_feats': ce},
-            loss_weights={'decoded': 0.0, 'decoded_feats': 1.0}
+            inputs=[data], outputs=[decoded_adj, decoded_feats]
     )
 
+    # compile the autoencoder
+    adam = optimizers.Adam(lr=0.001, decay=0.0)
+
+    autoencoder.compile(
+        optimizer=adam,
+        loss={'decoded_adj': masked_mean_squared_error,
+              'decoded_feats': create_weighted_cosine_similarity(weights=node_features_weight)},
+        loss_weights={'decoded_adj': 2.0, 'decoded_feats': 1.0}
+    )
     if weights is not None:
         autoencoder.load_weights(weights)
 
@@ -274,4 +292,3 @@ def autoencoder_multitask(adj, feats, labels, weights=None):
         autoencoder.load_weights(weights)
 
     return encoder, autoencoder
-

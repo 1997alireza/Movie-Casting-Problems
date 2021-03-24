@@ -19,6 +19,9 @@ __top_genres_list = ['Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror
                      'Science Fiction', 'Family', 'Mystery', 'Fantasy', 'Animation', 'Foreign', 'Music', 'History',
                      'War', 'Western', 'TV Movie']
 
+__top_genres_movies_count = [20265, 13182, 7624, 6735, 6596, 4673, 4307, 3932, 3496, 3049, 2770, 2467, 2313, 1935, 1622,
+                             1598, 1398, 1323, 1042, 767]
+
 
 # def rating_of_movie(tmdb_id):
 #     """
@@ -84,36 +87,36 @@ def in_top_genres(tmdb_id):
     return False
 
 
-def actor_rating_genre_based(actor_id):
-    """
-
-    :param actor_id: it's equal to credits.cast.id
-    :return: normalized actor's feature based on its ratings in top genres (__genres_list), as a numpy array
-    """
-    actor_id = int(actor_id)
-    genres = dict((g, 0) for g in __top_genres_list)
-    for i in range(len(__credits)):
-        casts_id = [c['id'] for c in eval(__credits['cast'][i])]
-        if actor_id in casts_id:
-            movie_id = __credits['id'][i]
-            movie_genres = genres_of_movie(movie_id)
-
-            try:
-                movie_rating = rating_of_movie(movie_id)
-            except Exception:  # no rating has been found for the movie
-                continue
-
-            for g in movie_genres:
-                if g in genres:
-                    genres[g] += movie_rating
-
-    feature = np.array(list(genres.values()))
-    total = sum(feature)
-
-    if total == 0:
-        raise Exception('actor id {} is not found in any rated movie\'s casts from top genres.'.format(actor_id))
-
-    return feature / total
+# def actor_rating_genre_based(actor_id):
+#     """
+#
+#     :param actor_id: it's equal to credits.cast.id
+#     :return: normalized actor's feature based on its ratings in top genres (__genres_list), as a numpy array
+#     """
+#     actor_id = int(actor_id)
+#     genres = dict((g, 0) for g in __top_genres_list)
+#     for i in range(len(__credits)):
+#         casts_id = [c['id'] for c in eval(__credits['cast'][i])]
+#         if actor_id in casts_id:
+#             movie_id = __credits['id'][i]
+#             movie_genres = genres_of_movie(movie_id)
+#
+#             try:
+#                 movie_rating = rating_of_movie(movie_id)
+#             except Exception:  # no rating has been found for the movie
+#                 continue
+#
+#             for g in movie_genres:
+#                 if g in genres:
+#                     genres[g] += movie_rating
+#
+#     feature = np.array(list(genres.values()))
+#     total = sum(feature)
+#
+#     if total == 0:
+#         raise Exception('actor id {} is not found in any rated movie\'s casts from top genres.'.format(actor_id))
+#
+#     return feature / total
 
 
 def actors_rating_genre_based(actor_ids):
@@ -154,3 +157,11 @@ def actors_rating_genre_based(actor_ids):
 
     print('Actors features are extracted')
     return normalize(features)
+
+
+def actors_feature_balancing_weight():
+    """
+    if a feature is more popular and has a higher value in total, its weight is lower
+    :return:
+    """
+    return np.array([1/c for c in __top_genres_movies_count])

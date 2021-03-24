@@ -39,7 +39,7 @@ def sample_mask(idx, l):
     return np.array(mask, dtype=np.bool)
 
 
-def load_citation_data(dataset_str):  #TODO: clear
+def load_citation_data(dataset_str):  #TODO: clear or remove
     """Load citation data."""
     names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph']
     objects = []
@@ -119,7 +119,7 @@ def sparse_to_tuple(sparse_mx):
     return coords, values, shape
 
 
-def split_citation_data(adj):
+def split_adjacency_data(adj):
     """
     Function to build test set with 10% positive links and
     the same number of randomly sampled negative links.
