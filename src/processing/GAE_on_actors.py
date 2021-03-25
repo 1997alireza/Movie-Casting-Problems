@@ -12,6 +12,7 @@ from datetime import datetime
 import numpy as np
 import paths
 from tensorflow import keras
+from src.modelling.LoNGAE.models.ae import autoencoder_with_node_features
 
 
 def train():
@@ -29,8 +30,15 @@ def load_encoder_model(file_path=paths.models+'actors_graph_ae/encoder.keras'):
     return keras.models.load_model(file_path)
 
 
-def load_autoencoder_model(file_path=paths.models+'actors_graph_ae/autoencoder.keras'):
-    return keras.models.load_model(file_path)
+# def load_autoencoder_model(file_path=paths.models+'actors_graph_ae/autoencoder.keras'):  # TODO: remove
+#     return keras.models.load_model(file_path, custom_objects={'DenseTied': DenseTied})
+
+
+def load_autoencoder_model(adj, feats, node_features_weight,
+                           file_path=paths.models + 'actors_graph_ae/autoencoder_weights.h5'):
+    _, ae = autoencoder_with_node_features(adj.shape[1], feats.shape[1], node_features_weight)
+    ae.load_weights(file_path)
+    return ae
 
 
 def get_latent_vector_generator():
@@ -65,9 +73,56 @@ def get_latent_vector_generator():
     return latent_vector_generator, actors_id
 
 
+def get_weight_predictor():
+    """
+
+    create a function mapping from actor to predicted weights for its edges
+    Note: the model must be trained beforehand
+    :return: the weight predictor of actors, and the list of actor ids
+    """
+    actors_adjacency, actors_feature, actors_id = get_actors_network_features()
+    node_features_weight = actors_feature_balancing_weight()
+    try:
+        ae = load_autoencoder_model(actors_adjacency, actors_feature, node_features_weight)
+    except OSError:
+        raise Exception('the model must be trained beforehand using the train function')
+
+    def weight_predictor(actor_id):
+        """
+
+        :param actor_id:
+        :return: a 1d numpy array with length of number of the nodes in the graph
+        """
+        try:
+            actor_idx = actors_id.index(actor_id)
+        except ValueError:
+            raise Exception('actor id is not found in the graph')
+        adj = actors_adjacency[actor_idx]
+        feat = actors_feature[actor_idx]
+        adj_aug = np.concatenate((adj, feat))
+        adj_aug_outs = ae.predict(adj_aug.reshape(1, -1))  # a list with length 2 [decoded_adj, decoded_feats]
+        adj_outs = adj_aug_outs[0]
+        adj_out = adj_outs[0]  # prediction on one sample
+        return adj_out
+
+    return weight_predictor, actors_id
+
+
 if __name__ == '__main__':
+    import sys
+    orig_stdout = sys.stdout
+    f = open(paths.logs + 'ae training.txt', 'w')
+    sys.stdout = f
+
     train()
+
+    sys.stdout = orig_stdout
+    f.close()
     exit()
+
+    weight_predictor, actors_id = get_weight_predictor()
+    print(weight_predictor(actors_id[0]))
+    print(len(weight_predictor(actors_id[0])))
+
     latent_vector_generator, actors_id = get_latent_vector_generator()
-    print(actors_id)
     print(latent_vector_generator(actors_id[0]))

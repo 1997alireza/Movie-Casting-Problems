@@ -12,7 +12,7 @@ import numpy as np
 from keras import backend as K
 from sklearn.preprocessing import MaxAbsScaler
 
-from src.utils.mathematical import MSE, euclidean_distance
+from src.utils.mathematical import MSE
 from .utils import generate_data, batch_data
 from .utils_gcn import split_adjacency_data
 from .models.ae import autoencoder_with_node_features
@@ -102,7 +102,8 @@ def run(adj, feats, node_features_weight, evaluate_lp=False):
         print('Avg. training loss: {:s}'.format(str(train_loss)))
 
         encoder.save(paths.models + 'actors_graph_ae/encoder.keras')
-        ae.save(paths.models + 'actors_graph_ae/autoencoder.keras')
+        ae.save_weights(paths.models + 'actors_graph_ae/autoencoder_weights.h5')
+        # we couldn't save the autoencoder model itself because of the DenseTied layer
         print('\nTrained model is saved.')
 
         if evaluate_lp:
@@ -123,9 +124,9 @@ def run(adj, feats, node_features_weight, evaluate_lp=False):
             # print('Val AUC: {:6f}'.format(auc_score(labels, predictions)))  # continuous format is not supported
             # print('Val AP: {:6f}'.format(ap_score(labels, predictions)))  # continuous format is not supported
             # print('Val EuclideanDist: {:6f}'.format(euclidean_distance(labels, predictions)))
-            # print('Link prediction val (even on links with weight zero) MSE: {:6f}'.format(MSE(labels, predictions)))
+            # print('Link prediction val (including links with weight zero) MSE: {:6f}'.format(MSE(labels, predictions)))
 
-            print(list(zip(predictions[non_zero_labels_idx] * 10, labels[non_zero_labels_idx] * 10)))
+            # print(list(zip(predictions[non_zero_labels_idx] * 10, labels[non_zero_labels_idx] * 10)))
             print('Link prediction val MSE: {:6f}'.format(MSE(labels[non_zero_labels_idx], predictions[non_zero_labels_idx])))
 
     print('\nAll done.')

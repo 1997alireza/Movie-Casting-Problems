@@ -1,0 +1,502 @@
+Actors graph has been loaded from disk
+Actors features have been loaded from disk
+delta T:  0:00:00.580923
+
+Preparing test split...
+
+
+Compiling autoencoder model...
+
+Model: "model_2"
+__________________________________________________________________________________________________
+Layer (type)                    Output Shape         Param #     Connected to                     
+==================================================================================================
+data (InputLayer)               (None, 24140)        0                                            
+__________________________________________________________________________________________________
+drop1 (Dropout)                 (None, 24140)        0           data[0][0]                       
+__________________________________________________________________________________________________
+encoded1 (Dense)                (None, 256)          6180096     drop1[0][0]                      
+__________________________________________________________________________________________________
+mvn1 (Lambda)                   (None, 256)          0           encoded1[0][0]                   
+__________________________________________________________________________________________________
+encoded2 (Dense)                (None, 128)          32896       mvn1[0][0]                       
+__________________________________________________________________________________________________
+mvn2 (Lambda)                   (None, 128)          0           encoded2[0][0]                   
+__________________________________________________________________________________________________
+drop2 (Dropout)                 (None, 128)          0           mvn2[0][0]                       
+__________________________________________________________________________________________________
+decoded2 (DenseTied)            (None, 256)          33152       drop2[0][0]                      
+__________________________________________________________________________________________________
+mvn3 (Lambda)                   (None, 256)          0           decoded2[0][0]                   
+__________________________________________________________________________________________________
+decoded1 (DenseTied)            (None, 24140)        6204236     mvn3[0][0]                       
+__________________________________________________________________________________________________
+decoded_adj_logits (Lambda)     (None, 24120)        0           decoded1[0][0]                   
+__________________________________________________________________________________________________
+decoded_feats_logits (Lambda)   (None, 20)           0           decoded1[0][0]                   
+__________________________________________________________________________________________________
+decoded_adj (Activation)        (None, 24120)        0           decoded_adj_logits[0][0]         
+__________________________________________________________________________________________________
+decoded_feats (Softmax)         (None, 20)           0           decoded_feats_logits[0][0]       
+==================================================================================================
+Total params: 6,237,388
+Trainable params: 6,237,388
+Non-trainable params: 0
+__________________________________________________________________________________________________
+None
+
+Fitting autoencoder model...
+
+
+Epoch 1/50
+Learning rate: 0.001000
+Avg. training loss: 0.05291735
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.011323
+
+Epoch 2/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045472
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.013874
+
+Epoch 3/50
+Learning rate: 0.001000
+Avg. training loss: 0.050453432
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.014314
+
+Epoch 4/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045332
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.014761
+
+Epoch 5/50
+Learning rate: 0.001000
+Avg. training loss: 0.050453126
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.013103
+
+Epoch 6/50
+Learning rate: 0.001000
+Avg. training loss: 0.050452646
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.008667
+
+Epoch 7/50
+Learning rate: 0.001000
+Avg. training loss: 0.050452247
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.006569
+
+Epoch 8/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451953
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005843
+
+Epoch 9/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451864
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005514
+
+Epoch 10/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045182
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005505
+
+Epoch 11/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045178
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005252
+
+Epoch 12/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451756
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005037
+
+Epoch 13/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045174
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005178
+
+Epoch 14/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451722
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004951
+
+Epoch 15/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045171
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004996
+
+Epoch 16/50
+Learning rate: 0.001000
+Avg. training loss: 0.0504517
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004991
+
+Epoch 17/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451692
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005101
+
+Epoch 18/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045168
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005135
+
+Epoch 19/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045168
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005010
+
+Epoch 20/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451666
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005138
+
+Epoch 21/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451666
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005170
+
+Epoch 22/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045166
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005167
+
+Epoch 23/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451655
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005130
+
+Epoch 24/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045166
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005239
+
+Epoch 25/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451644
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005086
+
+Epoch 26/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045164
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005084
+
+Epoch 27/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045164
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005012
+
+Epoch 28/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451636
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004884
+
+Epoch 29/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045162
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005147
+
+Epoch 30/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045162
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005211
+
+Epoch 31/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451625
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005021
+
+Epoch 32/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451614
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005066
+
+Epoch 33/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451614
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005092
+
+Epoch 34/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451614
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005060
+
+Epoch 35/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045161
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004983
+
+Epoch 36/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045161
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004922
+
+Epoch 37/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451603
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005156
+
+Epoch 38/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451603
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004932
+
+Epoch 39/50
+Learning rate: 0.001000
+Avg. training loss: 0.0504516
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004936
+
+Epoch 40/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045161
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004984
+
+Epoch 41/50
+Learning rate: 0.001000
+Avg. training loss: 0.0504516
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004844
+
+Epoch 42/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451588
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004932
+
+Epoch 43/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451584
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005018
+
+Epoch 44/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451584
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005035
+
+Epoch 45/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451584
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004846
+
+Epoch 46/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045158
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005161
+
+Epoch 47/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045158
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005101
+
+Epoch 48/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045158
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004770
+
+Epoch 49/50
+Learning rate: 0.001000
+Avg. training loss: 0.05045157
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.005029
+
+Epoch 50/50
+Learning rate: 0.001000
+Avg. training loss: 0.050451573
+
+Trained model is saved.
+
+Evaluating val set on link prediction...
+Link prediction val MSE: 0.004895
+
+All done.
+delta T:  5:14:56.421161

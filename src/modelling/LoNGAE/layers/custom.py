@@ -9,8 +9,8 @@ class DenseTied(Layer):
 
     @interfaces.legacy_dense_support
     def __init__(self, units,
-                 tie_to=None, # input layer name for weight-tying
-                 transpose=False, # transpose weights from tie_to layer
+                 tie_to=None,  # input layer name for weight-tying
+                 transpose=False,  # transpose weights from tie_to layer
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -45,12 +45,12 @@ class DenseTied(Layer):
     def build(self, input_shape):
         assert len(input_shape) >= 2
         input_dim = input_shape[-1]
-        
+
         if self.transpose:
             self.kernel = K.transpose(self.tie_to.kernel)
         else:
             self.kernel = self.tie_to.kernel
-        
+
         if self.use_bias:
             self.bias = self.add_weight(shape=(self.units,),
                                         initializer=self.bias_initializer,
@@ -93,4 +93,4 @@ class DenseTied(Layer):
         }
         base_config = super(DenseTied, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
-    
+
