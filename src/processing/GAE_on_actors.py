@@ -108,21 +108,32 @@ def get_weight_predictor():
     return weight_predictor, actors_id
 
 
+def target_actor_weight(target_actor_id, actors_id, predicted_weights):
+    try:
+        target_idx = actors_id.index(target_actor_id)
+    except:
+        raise Exception('Actor id {} is not found in the graph'.format(target_actor_id))
+
+    return predicted_weights[target_idx]
+
+
 if __name__ == '__main__':
-    import sys
-    orig_stdout = sys.stdout
-    f = open(paths.logs + 'ae training.txt', 'w')
-    sys.stdout = f
-
-    train()
-
-    sys.stdout = orig_stdout
-    f.close()
-    exit()
+    # import sys
+    # orig_stdout = sys.stdout
+    # f = open(paths.logs + 'ae training.txt', 'w')
+    # sys.stdout = f
+    #
+    # train()
+    #
+    # sys.stdout = orig_stdout
+    # f.close()
+    # exit()
 
     weight_predictor, actors_id = get_weight_predictor()
-    print(weight_predictor(actors_id[0]))
-    print(len(weight_predictor(actors_id[0])))
+    weights = weight_predictor(actors_id[0])
+    print(weights[0])
+    print(target_actor_weight(35, actors_id, weights))
+
 
     latent_vector_generator, actors_id = get_latent_vector_generator()
     print(latent_vector_generator(actors_id[0]))
