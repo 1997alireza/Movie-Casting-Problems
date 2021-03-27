@@ -37,12 +37,6 @@ def run(adj, feats, node_features_weight, evaluate_lp=False):
 
     train = adj.copy()
 
-    # TODO: for us?
-    # if dataset != 'pubmed':
-    #     train.setdiag(1.0)
-    # else:
-    #     train.setdiag(0.0)
-
     if evaluate_lp:
         print('\nPreparing test split...\n')
         test_inds = split_adjacency_data(adj)
@@ -61,9 +55,6 @@ def run(adj, feats, node_features_weight, evaluate_lp=False):
         # Impute missing edges of input adj with 0.0 for good results
         adj[test_r, test_c] = 0.0
         adj[test_c, test_r] = 0.0
-
-    # TODO: for us?
-    # adj.setdiag(1.0)  # enforce self-connections
 
     print('\nCompiling autoencoder model...\n')
 

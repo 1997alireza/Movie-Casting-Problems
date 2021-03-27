@@ -6,7 +6,8 @@ from keras import optimizers
 from keras import backend as K
 
 from ..layers.custom import DenseTied
-
+import tensorflow as tf
+tf.keras.losses.MeanSquaredError
 
 def mvn(tensor):
     """Per row mean-variance normalization."""
@@ -81,15 +82,15 @@ def masked_mean_squared_error(y_true, y_pred):
     return K.mean(masked_squared_err, axis=-1)
 
 
-def create_weighted_cosine_similarity(weights):
-    """ It returns a Cosine Similarity loss with a balancing weight on features """
-    def weighted_cosine_similarity(y_true, y_pred):
+def create_weighted_cosine_similarity_loss(weights):
+    """ It returns a Cosine Similarity loss (= -1 * Cosine Similarity) with a balancing weight on features """
+    def weighted_cosine_similarity_loss(y_true, y_pred):
         inner_prod = K.sum(y_true * y_pred * weights, axis=-1)
         y_true_norm = K.sum(y_true * y_true * weights, axis=-1)
         y_pred_norm = K.sum(y_pred * y_pred * weights, axis=-1)
-        return inner_prod / (K.sqrt(y_true_norm) * K.sqrt(y_pred_norm))
+        return -1 * inner_prod / (K.sqrt(y_true_norm) * K.sqrt(y_pred_norm))
 
-    return weighted_cosine_similarity
+    return weighted_cosine_similarity_loss
 
 
 def autoencoder_with_node_features(adj_row_length, features_length, node_features_weight, weights=None):
@@ -157,8 +158,8 @@ def autoencoder_with_node_features(adj_row_length, features_length, node_feature
     autoencoder.compile(
         optimizer=adam,
         loss={'decoded_adj': masked_mean_squared_error,
-              'decoded_feats': create_weighted_cosine_similarity(weights=node_features_weight)},
-        loss_weights={'decoded_adj': 2.0, 'decoded_feats': 1.0}
+              'decoded_feats': create_weighted_cosine_similarity_loss(weights=node_features_weight)},
+        loss_weights={'decoded_adj': 3.0, 'decoded_feats': 1.0}
     )
     if weights is not None:
         autoencoder.load_weights(weights)

@@ -30,10 +30,6 @@ def load_encoder_model(file_path=paths.models+'actors_graph_ae/encoder.keras'):
     return keras.models.load_model(file_path)
 
 
-# def load_autoencoder_model(file_path=paths.models+'actors_graph_ae/autoencoder.keras'):  # TODO: remove
-#     return keras.models.load_model(file_path, custom_objects={'DenseTied': DenseTied})
-
-
 def load_autoencoder_model(adj, feats, node_features_weight,
                            file_path=paths.models + 'actors_graph_ae/autoencoder_weights.h5'):
     _, ae = autoencoder_with_node_features(adj.shape[1], feats.shape[1], node_features_weight)
@@ -118,22 +114,13 @@ def target_actor_weight(target_actor_id, actors_id, predicted_weights):
 
 
 if __name__ == '__main__':
-    # import sys
-    # orig_stdout = sys.stdout
-    # f = open(paths.logs + 'ae training.txt', 'w')
-    # sys.stdout = f
-    #
     # train()
-    #
-    # sys.stdout = orig_stdout
-    # f.close()
     # exit()
 
     weight_predictor, actors_id = get_weight_predictor()
     weights = weight_predictor(actors_id[0])
     print(weights[0])
     print(target_actor_weight(35, actors_id, weights))
-
 
     latent_vector_generator, actors_id = get_latent_vector_generator()
     print(latent_vector_generator(actors_id[0]))
