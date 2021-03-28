@@ -5,6 +5,8 @@ from src.processing.GAE_on_actors import get_latent_vector_generator
 from src.utils.TM_dataset import actor_name, get_top_actors
 
 
+# This file is supposed to show a dimentional reduction of visulation of actors latent vectors
+
 def prepare_data():
     __plot_size = 100
     latent_vector_generator, actors_id = get_latent_vector_generator()
@@ -16,15 +18,16 @@ def prepare_data():
             names.append(actor_name(actor)[0])
         except:
             pass
-    return data
+    return [data, names]
 
 
-def draw_pca(data, n=2):
+def draw_pca(data, names, n=2):
     pca = PCA(2)  # project from 128 to 2 dimensions
     projected = pca.fit_transform(data)
-
     fig = px.scatter(x=projected[:, 0], y=projected[:, 1], color=names)
     fig.show()
 
 
-draw_pca(prepare_data(), 2)
+if __name__ == '__main__':
+    data, names = prepare_data()
+    draw_pca(data, names, 2)

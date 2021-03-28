@@ -171,6 +171,10 @@ def actors_feature_balancing_weight():
 
 
 def prepare_actors():
+    """
+    creates a global cache of actor and movie relations using python dictionary
+    :return:
+    """
     global __credits
     global __actors_movie_count
     if (not len(__actors_id_name)):
@@ -194,14 +198,18 @@ def actor_name(actor_id):
 
 
 def get_top_actors(n):
+    """
+    calculates n most active actors
+    :param n: number of requested actors
+    :return: list of n actors with most movies played
+    """
     prepare_actors()
     sorted_actors = dict(sorted(__actors_movie_count.items(), key=lambda item: item[1], reverse=True))
     i = 0
-    res = []
+    result = []
     for actor in sorted_actors:
-        print(actor)
         i += 1
-        res.append(actor)
+        result.append(actor)
         if (i > n):
             break
-    return (res)
+    return (result)
