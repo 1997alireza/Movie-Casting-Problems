@@ -69,12 +69,12 @@ def get_latent_vector_generator():
     return latent_vector_generator, actors_id
 
 
-def get_weight_predictor():
+def get_rating_predictor():
     """
 
-    create a function mapping from actor to predicted weights for its edges
+    create a function mapping from actor to predicted ratings for its edges and genres
     Note: the model must be trained beforehand
-    :return: the weight predictor of actors, and the list of actor ids
+    :return: the rating predictor of actors, and the list of actor ids
     """
     actors_adjacency, actors_feature, actors_id = get_actors_network_features()
     node_features_weight = actors_feature_balancing_weight()
@@ -83,11 +83,13 @@ def get_weight_predictor():
     except OSError:
         raise Exception('the model must be trained beforehand using the train function')
 
-    def weight_predictor(actor_id):
+    def rating_predictor(actor_id):
         """
 
         :param actor_id:
-        :return: a 1d numpy array with length of number of the nodes in the graph
+        :return: two 1d numpy arrays;
+        first array is predicted average ratings for its edges with length of number of the nodes in the graph
+        second array is predicted average ratings for the actor in each genres
         """
         try:
             actor_idx = actors_id.index(actor_id)
@@ -97,11 +99,11 @@ def get_weight_predictor():
         feat = actors_feature[actor_idx]
         adj_aug = np.concatenate((adj, feat))
         adj_aug_outs = ae.predict(adj_aug.reshape(1, -1))  # a list with length 2 [decoded_adj, decoded_feats]
-        adj_outs = adj_aug_outs[0]
-        adj_out = adj_outs[0]  # prediction on one sample
-        return adj_out
+        adj_outs, feat_outs = adj_aug_outs[0], adj_aug_outs[1]
+        adj_out, feat_out = adj_outs[0], feat_outs[0]  # prediction on one sample
+        return adj_out, feat_out
 
-    return weight_predictor, actors_id
+    return rating_predictor, actors_id
 
 
 def target_actor_weight(target_actor_id, actors_id, predicted_weights):
@@ -117,10 +119,12 @@ if __name__ == '__main__':
     # train()
     # exit()
 
-    weight_predictor, actors_id = get_weight_predictor()
-    weights = weight_predictor(actors_id[0])
-    print(weights[0])
-    print(target_actor_weight(35, actors_id, weights))
+    rating_predictor, actors_id = get_rating_predictor()
+    edges_weights, genres_weights = rating_predictor(actors_id[0])
+    print(edges_weights[0])
+    print(target_actor_weight(35, actors_id, edges_weights))
+    print(genres_weights)
+    exit()
 
     latent_vector_generator, actors_id = get_latent_vector_generator()
     print(latent_vector_generator(actors_id[0]))
