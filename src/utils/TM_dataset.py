@@ -2,6 +2,7 @@
 utils to work with the movies database (TMDB)
 """
 
+import ast
 import pandas as pd
 import paths
 import numpy as np
@@ -11,8 +12,10 @@ from math import isnan
 __links_df = pd.read_csv(paths.the_movies_dataset + 'links.csv', usecols=['tmdbId', 'movieId'])
 __ratings_df = pd.read_csv(paths.the_movies_dataset + 'ratings.csv', usecols=['movieId', 'rating'])
 __credits = pd.read_csv(paths.the_movies_dataset + 'credits.csv', usecols=['id', 'cast'])  # this id is tmdb_id
-__movies = pd.read_csv(paths.the_movies_dataset + 'movies_metadata.csv', usecols=['id', 'genres', 'vote_average'])  # this id is tmdb_id
-
+__movies = pd.read_csv(paths.the_movies_dataset + 'movies_metadata.csv',
+                       usecols=['id', 'genres', 'vote_average'])  # this id is tmdb_id
+__actors_id_name = {}
+__actors_movie_count = {}
 
 # list of the genres with high number of movies in the movies dataset
 __top_genres_list = ['Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror', 'Crime', 'Documentary', 'Adventure',
@@ -164,4 +167,41 @@ def actors_feature_balancing_weight():
     if a feature is more popular and has a higher value in total, its weight is lower
     :return:
     """
-    return np.array([1/c for c in __top_genres_movies_count])
+    return np.array([1 / c for c in __top_genres_movies_count])
+
+
+def prepare_actors():
+    global __credits
+    global __actors_movie_count
+    if (not len(__actors_id_name)):
+        for i in range(len(__credits)):
+            cast = ast.literal_eval(__credits['cast'][i])
+            for j in range(len(cast)):
+                __actors_id_name[cast[j]['id']] = [cast[j]['name']]
+                if cast[j]['id'] in __actors_movie_count:
+                    __actors_movie_count[cast[j]['id']] = __actors_movie_count[cast[j]['id']] + 1
+                else:
+                    __actors_movie_count[cast[j]['id']] = 1
+
+
+def actor_name(actor_id):
+    """
+    :param actor_id: an integer which is equal to credits.cast.id
+    :return: credits.cast.name
+    """
+    prepare_actors()
+    return __actors_id_name[actor_id]
+
+
+def get_top_actors(n):
+    prepare_actors()
+    sorted_actors = dict(sorted(__actors_movie_count.items(), key=lambda item: item[1], reverse=True))
+    i = 0
+    res = []
+    for actor in sorted_actors:
+        print(actor)
+        i += 1
+        res.append(actor)
+        if (i > n):
+            break
+    return (res)
