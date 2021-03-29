@@ -1,25 +1,36 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+import plotly.express as px
 import paths
 
+__movie_meta = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', low_memory=False)
 
-def counting_values(df, column):
-    value_count = {}
-    for row in df[column].dropna():
-        if row in value_count:
-            value_count[row] += 1
-        else:
-            value_count[row] = 1
-    return value_count
+
+# def counting_values(df, column):
+#     """
+#     counts given column on the df distribution
+#     :return: value_count: shows how many times a value has been repeated
+#     """
+#     value_count = {}
+#     for row in df[column].dropna():
+#         if row == 0.0:
+#             pass
+#         elif row in value_count:
+#             value_count[row] += 1
+#         else:
+#             value_count[row] = 1
+#     return pd.DataFrame.from_dict(value_count, orient='index')
+
+
+def ratings_histogram():
+    """
+    plots a histogram on movie ratings
+    :return:
+    """
+    global __movie_meta
+    fig = px.histogram(__movie_meta[__movie_meta['vote_average'] > 0], x='vote_average',
+                       labels={'x': 'ratings', 'y': 'count'})
+    fig.show()
 
 
 if __name__ == '__main__':
-    movie_meta = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', low_memory=False)
-    votes_count = pd.Series(counting_values(movie_meta, 'vote_average'))
-    cmap = plt.cm.tab10
-    colors = cmap(np.arange(len(votes_count)) % cmap.N)
-    fig = plt.figure()
-    votes_count.sort_values(ascending=False).plot(kind='bar', color=colors)
-    fig.show()
-    
+    ratings_histogram()
