@@ -175,8 +175,7 @@ def prepare_actors():
     creates a global cache of actor and movie relations using python dictionary
     :return:
     """
-    global __credits
-    global __actors_movie_count
+    global __credits, __actors_movie_count
     if (not len(__actors_id_name)):
         for i in range(len(__credits)):
             cast = ast.literal_eval(__credits['cast'][i])
