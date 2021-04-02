@@ -47,7 +47,7 @@ def get_cast_score(movie_id, actor_depth):
     :param movie_id
     :return: actor_depth: depth used for recognizing important actors
     """
-    cast = __credits[__credits['id'] == movie_id]['cast'][0]
+    cast = __credits[__credits['id'] == movie_id]['cast'].values.tolist()[0]
     cast_pairs = get_all_pairs(filter(is_in_graph, parse_movie_cast(cast, actor_depth)))
     genres = genres_of_movie(movie_id)
     s_score = ws_score = 0
@@ -58,4 +58,5 @@ def get_cast_score(movie_id, actor_depth):
 
 
 if __name__ == '__main__':
-    print(get_cast_score(862, 5))
+    for movie_id in __credits['id']:
+        print(get_cast_score(movie_id, 5))
