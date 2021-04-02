@@ -1,10 +1,11 @@
 import paths
 import pandas as pd
+import numpy as np
+
 
 if __name__ == '__main__':
-
     # TODO: remove
-    import pickle, numpy as np
+    import pickle
     import matplotlib.pyplot as plt
     with open('./modelling/potentialities_10perc.pkl', 'rb') as file:
         director_cast_potentialities = pickle.load(file)
