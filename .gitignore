@@ -8,5 +8,4 @@ datasets/
 models/
 temporal_data/
 
-*.png
 *.pkl
