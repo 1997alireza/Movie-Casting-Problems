@@ -212,3 +212,7 @@ def get_top_actors(n):
         if (i > n):
             break
     return (result)
+
+def get_genre_index(genre):
+    global __top_genres_list
+    return __top_genres_list.index(genre)

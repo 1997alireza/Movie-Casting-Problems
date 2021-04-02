@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.express as px
+
 import paths
 
 __movie_meta = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', low_memory=False)
@@ -23,7 +24,7 @@ __movie_meta = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', lo
 
 def ratings_histogram():
     """
-    plots a histogram on movie ratings
+    plots a histogram on movie ratings distribution
     :return:
     """
     global __movie_meta

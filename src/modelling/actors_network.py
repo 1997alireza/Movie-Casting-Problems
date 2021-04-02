@@ -10,6 +10,23 @@ __credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv', usecols=['id'
 __movies = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', usecols=['id', 'vote_average'])
 
 
+def get_all_pairs(items):
+    """
+    calculates all pairs of a given list
+    :param items: python built-in list
+    :return: list of pairs
+    """
+    return list(combinations(items, 2))
+
+
+def parse_movie_cast(cast, actor_depth):
+    movie_cast = []
+    res = ast.literal_eval(cast)
+    for j in range(min(len(res), actor_depth)):
+        movie_cast.append(res[j]['id'])
+    return movie_cast
+
+
 def get_network(actor_depth, coacting_count_threshold):
     """
     generating the undirected actors graph
@@ -25,20 +42,15 @@ def get_network(actor_depth, coacting_count_threshold):
     actors_graph = nx.Graph()
     for i in range(len(__credits)):
         movie_id = __credits['id'][i]
+        # checking primary condition: only movies with ratings and top genres
         if not in_top_genres(movie_id):
             continue
-
-        cast = __credits['cast'][i]
-        res = ast.literal_eval(cast)
-        movie_cast = []
-
         try:
             movie_rating = rating_of_movie(movie_id)
         except Exception:  # no rating has been found for the movie
             continue
 
-        for j in range(min(len(res), actor_depth)):
-            movie_cast.append(res[j]['id'])
+        movie_cast = parse_movie_cast(['cast'][i], actor_depth)
 
         # self-connection edges
         for actor_id in movie_cast:
@@ -50,9 +62,9 @@ def get_network(actor_depth, coacting_count_threshold):
                 rating_sum = movie_rating
 
             actors_graph.add_edge(actor_id, actor_id,
-                                  count=common_count, rating_sum=rating_sum, weight=rating_sum/common_count)
+                                  count=common_count, rating_sum=rating_sum, weight=rating_sum / common_count)
 
-        edges = list(combinations(movie_cast, 2))  # extracting subsets with length equals to 2
+        edges = get_all_pairs(movie_cast)  # extracting subsets with length equals to 2
 
         for k in range(len(edges)):
             if actors_graph.has_edge(edges[k][0], edges[k][1]):
@@ -63,7 +75,7 @@ def get_network(actor_depth, coacting_count_threshold):
                 rating_sum = movie_rating
 
             actors_graph.add_edge(edges[k][0], edges[k][1],
-                                  count=common_count, rating_sum=rating_sum, weight=rating_sum/common_count)
+                                  count=common_count, rating_sum=rating_sum, weight=rating_sum / common_count)
 
     selected = [(u, v, d) for (u, v, d) in actors_graph.edges(data=True) if d['count'] >= coacting_count_threshold]
 
