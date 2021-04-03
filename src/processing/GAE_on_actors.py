@@ -16,6 +16,7 @@ from src.modelling.LoNGAE.models.ae import autoencoder_with_node_features
 
 
 def train():
+    # training and validation logs on each epochs are saved in /docs/logs/ae training.txt
     time_zero = datetime.now()
     actors_adjacency, actors_feature, actors_id = get_actors_network_features()
     node_features_weight = actors_feature_balancing_weight()

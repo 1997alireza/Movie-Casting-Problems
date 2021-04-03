@@ -7,7 +7,7 @@ import numpy as np
 
 def weight_distribution():
     # the distribution of edges' weight of the actors network
-    # is located in /docs/plots/actors network weights.png
+    # the histogram plot is located in /docs/plots/actors network weights.png
     graph_file_path = paths.models + 'actors_network/graph_{}_{}.pkl'.format(5, 2)
     graph = pickle.load(open(graph_file_path, 'rb'))
     graph_weights = []
@@ -20,7 +20,7 @@ def weight_distribution():
 
 def predicted_weight_distribution():
     # the distribution of edges' weight of the predicted actors network by LoNGAE
-    # is located in /docs/plots/predicted actors network weights.png
+    # the histogram plot is located in /docs/plots/predicted actors network weights.png
 
     bin_counts = [0] * int(1.0 / 0.005)  # bins for the range [0., 1.] whose lengths is 0.005
 
