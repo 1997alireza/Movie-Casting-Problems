@@ -93,7 +93,7 @@ def create_weighted_cosine_similarity_loss(weights):
     return weighted_cosine_similarity_loss
 
 
-def autoencoder_with_node_features(adj_row_length, features_length, node_features_weight, weights=None):
+def autoencoder_with_node_features(adj_row_length, features_length, node_features_weight):
     h = adj_row_length
     w = adj_row_length + features_length
 
@@ -161,7 +161,5 @@ def autoencoder_with_node_features(adj_row_length, features_length, node_feature
               'decoded_feats': create_weighted_cosine_similarity_loss(weights=node_features_weight)},
         loss_weights={'decoded_adj': 3.0, 'decoded_feats': 1.0}
     )
-    if weights is not None:
-        autoencoder.load_weights(weights)
 
     return encoder, autoencoder

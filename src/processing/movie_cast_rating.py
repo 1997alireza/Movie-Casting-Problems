@@ -27,7 +27,7 @@ def predict(actor_a, actor_b):
 
 
 def rating(actor, genre):
-    """returns score of the actor in the given genre in our model"""
+    """returns rating of the actor in the given genre in our model"""
     global __rating_predictor
     __, genres_weights = __rating_predictor(actor)
     return genres_weights[get_genre_index(genre)]
@@ -44,9 +44,9 @@ def s(actor_a, actor_b, genres):
     return (predict(actor_a, actor_b) + predict(actor_b, actor_a)) / 2 * ws(actor_a, actor_b, genres)
 
 
-def get_cast_score(movie_id, actor_depth):
+def get_cast_rating(movie_id, actor_depth):
     """
-    scores a movie cast based on its genres ad actors relation predictions
+    assess a movie cast based on its genres and actors relation predictions
     :param movie_id
     :return: actor_depth: depth used for recognizing important actors
     """

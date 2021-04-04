@@ -6,7 +6,7 @@ print(len(cast_set))  # 205467
 print(len(edges))  # 513485
 
 Actors network:
-when training the whole dataset with actor_depth=5, coacting_count_threshold=2:
+when using the whole dataset with actor_depth=5, coacting_count_threshold=2:
 Actors network has been created with 24121 nodes and 38022 edges.
 """
 

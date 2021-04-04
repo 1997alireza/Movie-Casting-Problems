@@ -16,6 +16,7 @@ from src.modelling.LoNGAE.models.ae import autoencoder_with_node_features
 
 
 def train():
+    # training and validation logs on each epochs are saved in /docs/logs/ae training.txt
     time_zero = datetime.now()
     actors_adjacency, actors_feature, actors_id = get_actors_network_features()
     node_features_weight = actors_feature_balancing_weight()
@@ -27,13 +28,23 @@ def train():
 
 
 def load_encoder_model(file_path=paths.models+'actors_graph_ae/encoder.keras'):
-    return keras.models.load_model(file_path)
+    try:
+        encoder = keras.models.load_model(file_path)
+        print('The encoder model has been loaded from disk')
+    except OSError:
+        raise Exception('The model must be trained beforehand using the train function')
+    return encoder
 
 
 def load_autoencoder_model(adj, feats, node_features_weight,
                            file_path=paths.models + 'actors_graph_ae/autoencoder_weights.h5'):
-    _, ae = autoencoder_with_node_features(adj.shape[1], feats.shape[1], node_features_weight)
-    ae.load_weights(file_path)
+    try:
+        _, ae = autoencoder_with_node_features(adj.shape[1], feats.shape[1], node_features_weight)
+        ae.load_weights(file_path)
+        print('Weights of the autoencoder model have been loaded from disk')
+    except OSError:
+        raise Exception('the model must be trained beforehand using the train function')
+
     return ae
 
 
@@ -44,11 +55,7 @@ def get_latent_vector_generator():
     Note: the model must be trained beforehand
     :return: the latent vectors generator of actors, and the list of actor ids
     """
-    try:
-        encoder = load_encoder_model()
-    except OSError:
-        raise Exception('the model must be trained beforehand using the train function')
-
+    encoder = load_encoder_model()
     actors_adjacency, actors_feature, actors_id = get_actors_network_features()
 
     def latent_vector_generator(actor_id):
@@ -78,10 +85,7 @@ def get_rating_predictor():
     """
     actors_adjacency, actors_feature, actors_id = get_actors_network_features()
     node_features_weight = actors_feature_balancing_weight()
-    try:
-        ae = load_autoencoder_model(actors_adjacency, actors_feature, node_features_weight)
-    except OSError:
-        raise Exception('the model must be trained beforehand using the train function')
+    ae = load_autoencoder_model(actors_adjacency, actors_feature, node_features_weight)
 
     def rating_predictor(actor_id):
         """

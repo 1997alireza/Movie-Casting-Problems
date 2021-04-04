@@ -62,7 +62,6 @@ def run(adj, feats, node_features_weight, evaluate_lp=False):
 
     print(ae.summary())
 
-    aug_adj = np.hstack((adj, feats))
 
     # Specify some hyperparameters
     epochs = 50
@@ -71,6 +70,7 @@ def run(adj, feats, node_features_weight, evaluate_lp=False):
 
     print('\nFitting autoencoder model...\n')
 
+    aug_adj = np.hstack((adj, feats))
     training_data = generate_data(aug_adj, train, feats, shuffle=True)
     b_data = batch_data(training_data, train_batch_size)
     num_iters_per_train_epoch = aug_adj.shape[0] / train_batch_size
@@ -82,7 +82,8 @@ def run(adj, feats, node_features_weight, evaluate_lp=False):
         for batch_aug_adj, batch_train, batch_f in b_data:
             # Each iteration/loop is a batch of train_batch_size samples
             loss = ae.train_on_batch([batch_aug_adj], [batch_train, batch_f])
-            total_loss = loss[0]  # when we have multiple losses
+            total_loss = loss[0]
+            # when we have multiple losses, train_on_batch returns a list [total_loss, loss1, loss2, ...]
             train_loss.append(total_loss)
             curr_iter += 1
             if curr_iter >= num_iters_per_train_epoch:
