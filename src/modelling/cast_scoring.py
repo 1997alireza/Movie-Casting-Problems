@@ -5,8 +5,11 @@ from src.modelling.actors_network import parse_movie_cast, get_all_pairs
 from src.processing.GAE_on_actors import get_rating_predictor, target_actor_weight
 from src.utils.TM_dataset import genres_of_movie, get_genre_index
 
+__movies = pd.read_csv(paths.the_movies_dataset + 'movies_metadata.csv',
+                       usecols=['id', 'original_title'])
 __credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv', usecols=['id', 'cast'])
 __rating_predictor, __actors_id = get_rating_predictor()
+__movies_names = __movies_ids = {}
 
 
 def is_in_graph(actor):
@@ -47,16 +50,56 @@ def get_cast_score(movie_id, actor_depth):
     :param movie_id
     :return: actor_depth: depth used for recognizing important actors
     """
-    cast = __credits[__credits['id'] == movie_id]['cast'].values.tolist()[0]
-    cast_pairs = get_all_pairs(filter(is_in_graph, parse_movie_cast(cast, actor_depth)))
-    genres = genres_of_movie(movie_id)
-    s_score = ws_score = 0
-    for actor_a, actor_b in cast_pairs:
-        s_score += s(actor_a, actor_b, genres)
-        ws_score += ws(actor_a, actor_b, genres)
-    return s_score / ws_score
+    try:
+        cast = __credits[__credits['id'] == movie_id]['cast'].values.tolist()[0]
+        cast_pairs = get_all_pairs(filter(is_in_graph, parse_movie_cast(cast, actor_depth)))
+        genres = genres_of_movie(movie_id)
+        s_score = ws_score = 0
+        for actor_a, actor_b in cast_pairs:
+            s_score += s(actor_a, actor_b, genres)
+            ws_score += ws(actor_a, actor_b, genres)
+        return s_score / ws_score
+    except:
+        raise ('no scoring available')
+
+
+def movie_name(movie_id):
+    try:
+        return __movies_names[movie_id]
+    except:
+        raise Exception('movie id not found')
+
+
+def movie_id(movie_name):
+    try:
+        return __movies_ids[movie_name]
+    except:
+        raise Exception('movie name not found')
+
+
+def prepare_names():
+    global __movies_ids, __movies_names
+    for i in range(len(__movies)):
+        try:
+            __movies_ids[__movies['original_title'][i]] = int(__movies['id'][i])
+            __movies_names[str(__movies['id'][i])] = __movies['original_title'][i]
+        except:
+            pass
 
 
 if __name__ == '__main__':
+    prepare_names()
+    gret_cast_movies = ['The Big Lebowski', 'The Godfather', '12 Angry Men', 'The Departed', 'The Return of The King',
+                        'The Dark Knight', 'Black Hawk Dawn', 'Inception', 'Pulp Fiction', 'American Hustle']
+    # for movie in gret_cast_movies:
+    #     try:
+    #         print(movie + ": " + str(get_cast_score(movie_id(movie), 5)))
+    #     except:
+    #         pass
+
+    print()
     for movie_id in __credits['id']:
-        print(get_cast_score(movie_id, 5))
+        try:
+            print(movie_name(str(movie_id)) + ", " + str(get_cast_score(movie_id, 5)))
+        except:
+            print()
