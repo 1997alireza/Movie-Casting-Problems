@@ -34,14 +34,16 @@ def rating(actor, genre):
 
 
 def ws(actor_a, actor_b, genres):
+    """actor pair genre score"""
     ws = 0
     for genre in genres:
         ws += rating(actor_a, genre) + rating(actor_b, genre)
     return ws
 
 
-def s(actor_a, actor_b, genres):
-    return (predict(actor_a, actor_b) + predict(actor_b, actor_a)) / 2 * ws(actor_a, actor_b, genres)
+def s(actor_a, actor_b):
+    """actor pair score"""
+    return (predict(actor_a, actor_b) + predict(actor_b, actor_a)) / 2
 
 
 def get_cast_rating(movie_id, actor_depth):
@@ -54,11 +56,14 @@ def get_cast_rating(movie_id, actor_depth):
         cast = __credits[__credits['id'] == movie_id]['cast'].values.tolist()[0]
         cast_pairs = get_all_pairs(filter(is_in_graph, parse_movie_cast(cast, actor_depth)))
         genres = genres_of_movie(movie_id)
-        s_score = ws_score = 0
+        total_sws_score = total_ws_score = 0
         for actor_a, actor_b in cast_pairs:
-            s_score += s(actor_a, actor_b, genres)
-            ws_score += ws(actor_a, actor_b, genres)
-        return s_score / ws_score
+            ws_score = ws(actor_a, actor_b, genres)
+            total_sws_score += (s(actor_a, actor_b) * ws_score)
+            total_ws_score += ws_score
+
+        # weighted average of actors pairs scores with their genre scores as weights
+        return total_sws_score / total_ws_score
     except:
         raise Exception('no scoring available')
 
