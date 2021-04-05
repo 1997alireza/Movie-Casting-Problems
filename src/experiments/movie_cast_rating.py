@@ -1,4 +1,7 @@
 from src.modelling.actors_network import parse_movie_cast
+from src.modelling.movie_similarity import get_alternative_actors
+from src.processing.GAE_on_actors import get_rating_predictor
+from src.processing.alternative_actors import find_alternates
 from src.processing.movie_cast_rating import get_cast_rating, movie_id, movie_name, get_actor_cast_rating
 import paths
 import pandas as pd
@@ -83,19 +86,24 @@ def top_casts_percentile():
 
 
 def compare_alternative_actor_algorihtms_using_cast_rating():
-    actor = '22'
-    actor_alt_1 = '22'
-    actor_alt_2 = '23'
-    for movie in [get_actor_movies(actor)]:
-        cast = parse_movie_cast(get_cast(movie), 5)
-        cast.remove(int(actor))
-        cast.append(actor_alt_1)
-        print(cast)
-        print(get_actor_cast_rating(movie, 5, cast))
-        # cast = get_cast(movie)
-        # cast.remove(actor)
-        # cast.append(actor_alt_2)
-        # # print(get_actor_cast_rating(movie, 5, cast))
+    """Here we try to compute alternative actor to each actor using two algorithms
+    we provided: using movie similarty and vector space, then we try to compute score
+    of cast if th give actor is replaced by the alternative acot an compare values
+    Sample Experiments show 2n Algortihm is better"""
 
+    __, actors_id = get_rating_predictor()
+    for actor in actors_id:
+        try:
+            for movie in [get_actor_movies(actor)]:
+                cast = parse_movie_cast(get_cast(movie), 5)
+                cast.remove(int(actor))
+                cast.append(get_alternative_actors(actor))
+                print(get_actor_cast_rating(movie, 5, cast))
 
-compare_alternative_actor_algorihtms_using_cast_rating()
+                cast = parse_movie_cast(get_cast(movie), 5)
+                cast.remove(int(actor))
+                cast.append(find_alternates(actor, 1))
+                print(get_actor_cast_rating(movie, 5, cast))
+        except:
+            pass
+

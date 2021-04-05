@@ -105,6 +105,8 @@ def get_alternative_actors(actor):
             if get_index_from_title(candid) == None:
                 result = result + ", " + candid
         print(actor + "  ?  " + result)
+        return [candid]
+    return []
 
 
 
