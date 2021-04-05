@@ -90,20 +90,24 @@ def compare_alternative_actor_algorihtms_using_cast_rating():
     we provided: using movie similarty and vector space, then we try to compute score
     of cast if th give actor is replaced by the alternative acot an compare values
     Sample Experiments show 2n Algortihm is better"""
-
     __, actors_id = get_rating_predictor()
     for actor in actors_id:
-        try:
-            for movie in [get_actor_movies(actor)]:
+        for movie in [get_actor_movies(actor)]:
+            try:
+                print("original score: " + str(get_cast_rating(movie, 5)))
                 cast = parse_movie_cast(get_cast(movie), 5)
                 cast.remove(int(actor))
                 cast.append(get_alternative_actors(actor))
-                print(get_actor_cast_rating(movie, 5, cast))
+                print("alg 1 score: " + str(get_actor_cast_rating(movie, 5, cast)))
 
                 cast = parse_movie_cast(get_cast(movie), 5)
                 cast.remove(int(actor))
                 cast.append(find_alternates(actor, 1))
-                print(get_actor_cast_rating(movie, 5, cast))
-        except:
-            pass
+                print("alg 2 score: " + str(get_actor_cast_rating(movie, 5, cast)))
+                print()
+            except Exception as e:
+                print(e)
 
+
+if __name__ == '__main__':
+    compare_alternative_actor_algorihtms_using_cast_rating()
