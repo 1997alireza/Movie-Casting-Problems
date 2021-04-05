@@ -46,10 +46,44 @@ def s(actor_a, actor_b, genres):
 
 def get_cast_rating(movie_id, actor_depth):
     """
-    assess a movie cast based on its genres and actors relation predictions
+    compute a movie cast rating based on its genres and actors relation predictions
     :param movie_id
-    :return: actor_depth: depth used for recognizing important actors
+    :param actor_depth
+    :return: cast_score
     """
+    try:
+        cast = __credits[__credits['id'] == movie_id]['cast'].values.tolist()[0]
+        cast = filter(is_in_graph, parse_movie_cast(cast, actor_depth))
+        return get_actor_cast_rating(movie_id, actor_depth, cast)
+    except:
+        raise Exception('no scoring available')
+
+
+def get_actor_cast_rating(movie_id, actor_depth, cast):
+    """
+    compute a movie castscore based on given cast
+    :param movie_id
+    :param actor_depth
+    :param cast: list of actor_ids
+    :return: cast_score
+    """
+    try:
+        cast_pairs = get_all_pairs(cast)
+        genres = genres_of_movie(movie_id)
+        s_score = ws_score = 0
+        for actor_a, actor_b in cast_pairs:
+            s_score += s(actor_a, actor_b, genres)
+        ws_score += ws(actor_a, actor_b, genres)
+        return s_score / ws_score
+    except:
+        raise Exception('no scoring available')
+
+
+def movie_name(movie_id):
+    try:
+        return __movies_names[movie_id]
+    except:
+        raise Exception('movie id not found')
     try:
         cast = __credits[__credits['id'] == movie_id]['cast'].values.tolist()[0]
         cast_pairs = get_all_pairs(filter(is_in_graph, parse_movie_cast(cast, actor_depth)))
@@ -61,13 +95,6 @@ def get_cast_rating(movie_id, actor_depth):
         return s_score / ws_score
     except:
         raise Exception('no scoring available')
-
-
-def movie_name(movie_id):
-    try:
-        return __movies_names[movie_id]
-    except:
-        raise Exception('movie id not found')
 
 
 def movie_id(movie_name):

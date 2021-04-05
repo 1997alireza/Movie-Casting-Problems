@@ -4,7 +4,10 @@ import plotly.express as px
 import paths
 
 __movie_meta = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', low_memory=False)
+d = pd.read_csv(paths.the_movies_dataset + '/cast_rating.csv', low_memory=False)
 
+
+# d = pd.read_csv('/Users/ho3in/Desktop/' + '100_movie_cast_rating.csv', low_memory=False)
 
 # def counting_values(df, column):
 #     """
@@ -30,6 +33,11 @@ def ratings_histogram():
     global __movie_meta
     fig = px.histogram(__movie_meta[__movie_meta['vote_average'] > 0], x='vote_average',
                        labels={'x': 'ratings', 'y': 'count'})
+    fig.show()
+
+def cast_rating_histogram():
+    fig = px.histogram(d, x='rating',
+                       labels={'x': 'cast_rating', 'y': 'count'})
     fig.show()
 
 

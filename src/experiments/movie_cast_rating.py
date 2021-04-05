@@ -1,8 +1,11 @@
-from src.processing.movie_cast_rating import get_cast_rating, movie_id, movie_name
+from src.modelling.actors_network import parse_movie_cast
+from src.processing.movie_cast_rating import get_cast_rating, movie_id, movie_name, get_actor_cast_rating
 import paths
 import pandas as pd
 import csv
 import random
+
+from src.utils.TM_dataset import get_actor_movies, get_cast
 
 
 def top_cast_ratings():
@@ -77,3 +80,22 @@ def top_casts_percentile():
     # Inception: 0.6664521220990737, percentile 97%
     # Pulp Fiction: 0.5992585656312174, percentile 56%
     # American Hustle: 0.6967548573250509, percentile 99%
+
+
+def compare_alternative_actor_algorihtms_using_cast_rating():
+    actor = '22'
+    actor_alt_1 = '22'
+    actor_alt_2 = '23'
+    for movie in [get_actor_movies(actor)]:
+        cast = parse_movie_cast(get_cast(movie), 5)
+        cast.remove(int(actor))
+        cast.append(actor_alt_1)
+        print(cast)
+        print(get_actor_cast_rating(movie, 5, cast))
+        # cast = get_cast(movie)
+        # cast.remove(actor)
+        # cast.append(actor_alt_2)
+        # # print(get_actor_cast_rating(movie, 5, cast))
+
+
+compare_alternative_actor_algorihtms_using_cast_rating()
