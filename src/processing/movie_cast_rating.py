@@ -46,25 +46,41 @@ def s(actor_a, actor_b):
     return (predict(actor_a, actor_b) + predict(actor_b, actor_a)) / 2
 
 
-def get_cast_rating(movie_id, actor_depth):
+def get_movie_cast_rating(movie_id, actor_depth):
     """
-    assess a movie cast based on its genres and actors relation predictions
+    compute a movie cast rating based on its genres and actors relation predictions
     :param movie_id
-    :return: actor_depth: depth used for recognizing important actors
+    :param actor_depth
+    :return: cast_score
     """
     try:
         cast = __credits[__credits['id'] == movie_id]['cast'].values.tolist()[0]
-        cast_pairs = get_all_pairs(filter(is_in_graph, parse_movie_cast(cast, actor_depth)))
-        genres = genres_of_movie(movie_id)
+        cast = filter(is_in_graph, parse_movie_cast(cast, actor_depth))
+        movie_genres = genres_of_movie(movie_id)
+        return cast_group_rating(cast, movie_genres)
+    except:
+        raise Exception('no scoring available')
+
+
+def cast_group_rating(cast, movie_genres):
+    """
+    compute a movie cast-score based on given cast and the movie genres
+    :param cast: list of actor_ids
+    :param movie_genres: the genres of the movie
+    :return: cast_score
+    """
+    try:
+        cast_pairs = get_all_pairs(cast)
         total_sws_score = total_ws_score = 0
         for actor_a, actor_b in cast_pairs:
-            ws_score = ws(actor_a, actor_b, genres)
+            ws_score = ws(actor_a, actor_b, movie_genres)
             total_sws_score += (s(actor_a, actor_b) * ws_score)
             total_ws_score += ws_score
 
         # weighted average of actors pairs scores with their genre scores as weights
         return total_sws_score / total_ws_score
-    except:
+
+    except Exception:
         raise Exception('no scoring available')
 
 

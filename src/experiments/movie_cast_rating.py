@@ -1,8 +1,14 @@
-from src.processing.movie_cast_rating import get_cast_rating, movie_id, movie_name
+from src.modelling.actors_network import parse_movie_cast
+from src.modelling.movie_similarity import get_alternative_actors
+from src.processing.GAE_on_actors import get_rating_predictor
+from src.processing.alternative_actors import find_alternates
+from src.processing.movie_cast_rating import get_movie_cast_rating, movie_id, movie_name, cast_group_rating
 import paths
 import pandas as pd
 import csv
 import random
+
+from src.utils.TM_dataset import get_actor_movies, get_cast, genres_of_movie
 
 
 def top_cast_ratings():
@@ -12,7 +18,7 @@ def top_cast_ratings():
     ratings = {}
     for movie_name in top_cast_movies:
         try:
-            rating = get_cast_rating(movie_id(movie_name), 5)
+            rating = get_movie_cast_rating(movie_id(movie_name), 5)
             ratings[movie_name] = rating
         except:
             pass
@@ -40,7 +46,7 @@ def random_movies_cast_ratings():
     movie_ids = movie_ids[:1100]
     for movie_id in movie_ids:
         try:
-            rating = get_cast_rating(movie_id, 5)
+            rating = get_movie_cast_rating(movie_id, 5)
             writer.writerow([movie_name(str(movie_id)), str(rating)])
         except Exception:
             pass
@@ -77,3 +83,29 @@ def top_casts_percentile():
     # Inception: 0.6664521220990737, percentile 97%
     # Pulp Fiction: 0.5992585656312174, percentile 56%
     # American Hustle: 0.6967548573250509, percentile 99%
+
+
+def compare_alternative_actor_algorithms_using_cast_rating():
+    """Here we try to compute alternative actor to each actor using two algorithms
+    we provided: using movie similarity and vector space, then we try to compute score
+    of cast if th give actor is replaced by the alternative actor an compare values
+    Sample Experiments show 2nd algorithm is better"""
+
+    __, actors_id = get_rating_predictor()
+    for actor in actors_id:
+        try:
+            for movie_id in [get_actor_movies(actor)]:
+                movie_genres = genres_of_movie(movie_id)
+
+                cast = parse_movie_cast(get_cast(movie_id), 5)
+                cast.remove(int(actor))
+                cast.append(get_alternative_actors(actor))
+                print(cast_group_rating(cast, movie_genres))
+
+                cast = parse_movie_cast(get_cast(movie_id), 5)
+                cast.remove(int(actor))
+                cast.append(find_alternates(actor, 1))
+                print(cast_group_rating(cast, movie_genres))
+        except:
+            pass
+

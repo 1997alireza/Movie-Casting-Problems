@@ -16,6 +16,7 @@ __movies = pd.read_csv(paths.the_movies_dataset + 'movies_metadata.csv',
                        usecols=['id', 'genres', 'vote_average'])  # this id is tmdb_id
 __actors_id_name = {}
 __actors_movie_count = {}
+__actor_movies = {}
 
 # list of the genres with high number of movies in the movies dataset
 __top_genres_list = ['Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror', 'Crime', 'Documentary', 'Adventure',
@@ -175,11 +176,12 @@ def prepare_actors():
     creates a global cache of actor and movie relations using python dictionary
     :return:
     """
-    global __credits, __actors_movie_count
+    global __credits, __actors_movie_count, __actor_movies
     if (not len(__actors_id_name)):
         for i in range(len(__credits)):
             cast = ast.literal_eval(__credits['cast'][i])
             for j in range(len(cast)):
+                __actor_movies[cast[j]['id']] = int(__credits['id'][i])
                 __actors_id_name[cast[j]['id']] = [cast[j]['name']]
                 if cast[j]['id'] in __actors_movie_count:
                     __actors_movie_count[cast[j]['id']] = __actors_movie_count[cast[j]['id']] + 1
@@ -213,6 +215,20 @@ def get_top_actors(n):
             break
     return (result)
 
+
 def get_genre_index(genre):
     global __top_genres_list
     return __top_genres_list.index(genre)
+
+
+def get_actor_movies(actor):
+    """
+    return all movies placed by given actor
+    """
+    prepare_actors()
+    return __actor_movies[int(actor)]
+
+
+def get_cast(movie_id):
+    global __credits
+    return __credits[__credits['id'] == movie_id]['cast'].values.tolist()[0]
