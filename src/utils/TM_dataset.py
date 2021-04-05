@@ -15,6 +15,7 @@ __credits = pd.read_csv(paths.the_movies_dataset + 'credits.csv', usecols=['id',
 __movies = pd.read_csv(paths.the_movies_dataset + 'movies_metadata.csv',
                        usecols=['id', 'genres', 'vote_average'])  # this id is tmdb_id
 __actors_id_name = {}
+__actors_name_id = {}
 __actors_movie_count = {}
 __actor_movies = {}
 
@@ -183,6 +184,7 @@ def prepare_actors():
             for j in range(len(cast)):
                 __actor_movies[cast[j]['id']] = int(__credits['id'][i])
                 __actors_id_name[cast[j]['id']] = [cast[j]['name']]
+                __actors_name_id[cast[j]['name']] = [cast[j]['id']]
                 if cast[j]['id'] in __actors_movie_count:
                     __actors_movie_count[cast[j]['id']] = __actors_movie_count[cast[j]['id']] + 1
                 else:
@@ -196,6 +198,14 @@ def actor_name(actor_id):
     """
     prepare_actors()
     return __actors_id_name[actor_id]
+
+def actor_id(actor_name):
+    """
+    :param actor_id: an integer which is equal to credits.cast.id
+    :return: credits.cast.name
+    """
+    prepare_actors()
+    return __actors_name_id[actor_name]
 
 
 def get_top_actors(n):
