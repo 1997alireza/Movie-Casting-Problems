@@ -4,9 +4,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import ast
 from netwulf import visualize
-from networkx.drawing.nx_agraph import graphviz_layout
-import matplotlib.pyplot as plt
-import random
 
 import paths
 
@@ -97,24 +94,9 @@ def prepare_graph():
             MG.add_edge(cast_mem[k], movie, group='edge')
 
 
-def get_alternative_actors(actor):
-    if get_index_from_title(actor) == None:
-        candids = nx.descendants_at_distance(MG, actor, 3)
-        result = ""
-        for candid in candids:
-            if get_index_from_title(candid) == None:
-                result = result + ", " + candid
-        print(actor + "  ?  " + result)
-        return [candid]
-    return []
-
-
-
 if __name__ == '__main__':
     calculate_ids()
     cosine_sim = calc_cosine_sim()
     prepare_graph()
     print(MG)
     visualize(MG)
-    for actor in all_cast:
-        get_alternative_actors()
