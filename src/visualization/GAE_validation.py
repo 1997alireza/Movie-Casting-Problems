@@ -1,7 +1,7 @@
 import plotly.express as px
 
 if __name__ == '__main__':
-    # logs on 50 epochs, from /docs/logs/ae training.txt
+    # logs on 50 epochs, from /docs/logs/ae_training.txt
     # plots are located in /docs/plots/gae training loss.png, and gae link prediction error.png
     training_losses = [
         -0.6715881810951391,

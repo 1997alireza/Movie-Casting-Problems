@@ -60,7 +60,7 @@ def get_cast_rating(movie_id, actor_depth):
             ws_score += ws(actor_a, actor_b, genres)
         return s_score / ws_score
     except:
-        raise ('no scoring available')
+        raise Exception('no scoring available')
 
 
 def movie_name(movie_id):
@@ -87,19 +87,4 @@ def prepare_names():
             pass
 
 
-if __name__ == '__main__':
-    prepare_names()
-    gret_cast_movies = ['The Big Lebowski', 'The Godfather', '12 Angry Men', 'The Departed', 'The Return of The King',
-                        'The Dark Knight', 'Black Hawk Dawn', 'Inception', 'Pulp Fiction', 'American Hustle']
-    # for movie in gret_cast_movies:
-    #     try:
-    #         print(movie + ": " + str(get_cast_score(movie_id(movie), 5)))
-    #     except:
-    #         pass
-
-    print()
-    for movie_id in __credits['id']:
-        try:
-            print(movie_name(str(movie_id)) + ", " + str(get_cast_score(movie_id, 5)))
-        except:
-            print()
+prepare_names()
