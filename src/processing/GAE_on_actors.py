@@ -111,6 +111,8 @@ def get_rating_predictor():
 
 
 def target_actor_weight(target_actor_id, actors_id, predicted_weights):
+    """Co-Star Rating:
+    the predicted weight between two actors is considered as the measure showing how the actors match to be co-stars in a movie"""
     try:
         target_idx = actors_id.index(target_actor_id)
     except:
