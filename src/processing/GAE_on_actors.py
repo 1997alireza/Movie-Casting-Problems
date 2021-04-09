@@ -121,6 +121,26 @@ def target_actor_weight(target_actor_id, actors_id, predicted_weights):
     return predicted_weights[target_idx]
 
 
+class LinkWeightPredictor:
+    def __init__(self):
+        self.predictor, self.actors_id = get_rating_predictor()
+
+    def predict(self, actor_a, actor_b):
+        """
+        It is symmetrical with respect to two actors
+        :param actor_a: first actor id
+        :param actor_b: second actor id
+        :return: undirected link weight between given actors
+        """
+        ratings_a, _ = self.predictor(actor_a)
+        a2b_weight = target_actor_weight(actor_b, self.actors_id, ratings_a)
+
+        ratings_b, _ = self.predictor(actor_b)
+        b2a_weight = target_actor_weight(actor_a, self.actors_id, ratings_b)
+
+        return (a2b_weight + b2a_weight) / 2
+
+
 if __name__ == '__main__':
     # train()
     # exit()

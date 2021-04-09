@@ -1,22 +1,13 @@
 import pandas as pd
 import networkx as nx
 import ast
-from itertools import combinations
 import paths
 from src.utils.TM_dataset import rating_of_movie, in_top_genres
+from src.utils.mathematical import get_all_pairs
 
 pd.set_option('display.max_colwidth', None)
 __credits = pd.read_csv(paths.the_movies_dataset + '/credits.csv', usecols=['id', 'cast'])
 __movies = pd.read_csv(paths.the_movies_dataset + '/movies_metadata.csv', usecols=['id', 'vote_average'])
-
-
-def get_all_pairs(items):
-    """
-    calculates all pairs of a given list
-    :param items: python built-in list
-    :return: list of pairs
-    """
-    return list(combinations(items, 2))
 
 
 def parse_movie_cast(cast, actor_depth):
