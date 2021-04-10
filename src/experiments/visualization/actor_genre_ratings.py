@@ -1,3 +1,5 @@
+import math
+
 import plotly.graph_objects as go
 import pandas as pd
 
@@ -12,8 +14,12 @@ from src.utils.TM_dataset import actor_name
 
 sample_count = 100
 __, actors_id = get_rating_predictor()
-genres = ['Drama', 'Romance', 'Comedy', 'Action', 'Thriller', 'Horror', 'Crime', 'Documentary', 'Adventure',
-          'Mystery', 'Fantasy', 'Animation', 'Music', 'History', 'War', 'Western', 'TV Movie']
+genres = ['Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror', 'Crime', 'Documentary', 'Adventure',
+          'Science Fiction', 'Family', 'Mystery', 'Fantasy', 'Animation', 'Foreign', 'Music', 'History',
+          'War', 'Western', 'TV Movie']
+
+genres_count = [20265, 13182, 7624, 6735, 6596, 4673, 4307, 3932, 3496, 3049, 2770, 2467, 2313, 1935, 1622,
+                1598, 1398, 1323, 1042, 767]
 actor_names = [actor_name(actor)[0] for actor in actors_id[0:sample_count]]
 
 
@@ -32,11 +38,14 @@ def create_df():
         i += 1
         actor_data = []
         actor_data.append(actor_name(actor)[0])
+        j = 0
         for genre in genres:
-            actor_data.append(rating(actor, genre))
+            actor_data.append(rating(actor, genre) / genres_count[j])
+            j += 1
         data.append(actor_data)
-    cols = ['Name', 'Drama', 'Romance', 'Comedy', 'Action', 'Thriller', 'Horror', 'Crime', 'Documentary', 'Adventure',
-            'Mystery', 'Fantasy', 'Animation', 'Music', 'History', 'War', 'Western', 'TV Movie']
+    cols = ['Name', 'Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror', 'Crime', 'Documentary', 'Adventure',
+            'Science Fiction', 'Family', 'Mystery', 'Fantasy', 'Animation', 'Foreign', 'Music', 'History',
+            'War', 'Western', 'TV Movie']
     df = pd.DataFrame(data, columns=cols)
     return df
 
@@ -48,21 +57,21 @@ def radar_chart(df):
     app.layout = html.Div(children=[
         html.H1(children='Actor-Genre Radar Chart'),
         html.Div(children='''
-            You can see how good is a give actor in the given top genres.
+            You can see how good plays an actor in the given top genres and compare two actors.
         '''),
         html.Br(),
-        html.Div(["Actor A: ",
-                  dcc.Dropdown(
-                      id='input-actor-a',
-                      options=[{'label': actor_name, 'value': actor_name} for actor_name in actor_names],
-                      value='Jim Carrey'
-                  )]),
-        html.Div(["Actor B: ",
-                  dcc.Dropdown(
-                      id='input-actor-b',
-                      options=[{'label': actor_name, 'value': actor_name} for actor_name in actor_names],
-                      value='Uma Thurman'
-                  )]),
+        html.Div([dcc.Dropdown(
+            id='input-actor-a',
+            options=[{'label': actor_name, 'value': actor_name} for actor_name in actor_names],
+            value='Jim Carrey'
+        )],
+            style={'width': '48%', 'display': 'inline-block'}),
+        html.Div([dcc.Dropdown(
+            id='input-actor-b',
+            options=[{'label': actor_name, 'value': actor_name} for actor_name in actor_names],
+            value='Uma Thurman'
+        )],
+            style={'width': '48%', 'display': 'inline-block'}),
         dcc.Graph(
             id='radar-chart'
         )

@@ -33,12 +33,11 @@ def test_known_costars():
         try:
             duo_0 = actor_id(duo[0])[0]
             duo_1 = actor_id(duo[1])[0]
-            edges_weights, __ = rating_predictor(duo_0)
-            print(
-                str(duo[0]) + "->" + str(duo[1]) + ": " + str(target_actor_weight(duo_1, actors_id, edges_weights)))
-            edges_weights, __ = rating_predictor(duo_1)
-            print(
-                str(duo[1]) + "->" + str(duo[0]) + ": " + str(target_actor_weight(duo_0, actors_id, edges_weights)))
+            edges_weights_0, __ = rating_predictor(duo_0)
+            edges_weights_1, __ = rating_predictor(duo_1)
+            print(str(duo[0]) + "->" + str(duo[1]) + ": " + str(0.5 * (
+                    target_actor_weight(duo_1, actors_id, edges_weights_0)
+                    + target_actor_weight(duo_0, actors_id, edges_weights_1))))
             print()
 
         except Exception as e:
@@ -47,3 +46,4 @@ def test_known_costars():
 
 if __name__ == '__main__':
     test_known_costars()
+
