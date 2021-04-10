@@ -197,7 +197,8 @@ def actor_name(actor_id):
     :return: credits.cast.name
     """
     prepare_actors()
-    return __actors_id_name[actor_id]
+    return __actors_id_name[actor_id][0]
+
 
 def actor_id(actor_name):
     """
@@ -205,7 +206,7 @@ def actor_id(actor_name):
     :return: credits.cast.name
     """
     prepare_actors()
-    return __actors_name_id[actor_name]
+    return __actors_name_id[actor_name][0]
 
 
 def get_top_actors(n):

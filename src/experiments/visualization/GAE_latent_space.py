@@ -15,7 +15,7 @@ def prepare_data():
     for actor in get_top_actors(__plot_size):
         try:
             data.append(latent_vector_generator(actor))
-            names.append(actor_name(actor)[0])
+            names.append(actor_name(actor))
         except:
             pass
     return [data, names]
