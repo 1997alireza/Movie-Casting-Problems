@@ -31,8 +31,8 @@ def test_known_costars():
     rating_predictor, actors_id = get_rating_predictor()
     for duo in top_duos:
         try:
-            duo_0 = actor_id(duo[0])[0]
-            duo_1 = actor_id(duo[1])[0]
+            duo_0 = actor_id(duo[0])
+            duo_1 = actor_id(duo[1])
             edges_weights, __ = rating_predictor(duo_0)
             print(
                 str(duo[0]) + "->" + str(duo[1]) + ": " + str(target_actor_weight(duo_1, actors_id, edges_weights)))

@@ -4,6 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from src.processing.GAE_on_actors import LinkWeightPredictor
 from src.utils.mathematical import get_all_pairs
+from src.utils.TM_dataset import actor_name
 
 
 def extract_candidate_subgraph(graph, size_range=(10, 20), weight_range=(.45, .75)):
@@ -17,7 +18,7 @@ def extract_candidate_subgraph(graph, size_range=(10, 20), weight_range=(.45, .7
             return subgraph
 
 
-def show_graph(graph, pos, new_color=False):
+def show_graph(graph, pos, node_labels, new_color=False):
     edge_labels = nx.get_edge_attributes(graph, 'weight')
     for e in edge_labels:
         edge_labels[e] = int(edge_labels[e] * 1e2) / 1e2
@@ -25,9 +26,16 @@ def show_graph(graph, pos, new_color=False):
                                  edge_labels=edge_labels,
                                  pos=pos)
     if new_color:
-        nx.draw(graph, pos, node_color='red')
+        nx.draw(graph, pos, with_labels=True, labels=node_labels, node_color='red')
     else:
-        nx.draw(graph, pos)
+        nx.draw(graph, pos, with_labels=True, labels=node_labels)
+
+    # to prevent the graphic from being cut off
+    plt.axis('off')
+    axis = plt.gca()
+    axis.set_xlim([1.4 * x for x in axis.get_xlim()])
+    axis.set_ylim([1.4 * y for y in axis.get_ylim()])
+    plt.tight_layout()
     plt.show()
 
 
@@ -42,6 +50,8 @@ def predict_plot_graphs(predictor, graph):
         weight = predictor.predict(pair[0], pair[1])
         predicted_edges.append((*pair, {'weight': weight}))
 
+    node_labels = {n: actor_name(n) for n in graph.nodes}
+
     pos = nx.spring_layout(graph)
 
     graph = nx.Graph()
@@ -50,8 +60,8 @@ def predict_plot_graphs(predictor, graph):
     predicted_graph = nx.Graph()
     predicted_graph.add_edges_from(predicted_edges)
 
-    show_graph(graph, pos)
-    show_graph(predicted_graph, pos, new_color=True)
+    show_graph(graph, pos, node_labels)
+    show_graph(predicted_graph, pos, node_labels, new_color=True)
 
 
 if __name__ == '__main__':
@@ -59,9 +69,9 @@ if __name__ == '__main__':
     graph = pickle.load(open(graph_file_path, 'rb'))
     predictor = LinkWeightPredictor()
 
-    subgraph = extract_candidate_subgraph(graph)
+    # subgraph = extract_candidate_subgraph(graph)
     # a large subgraph: nodes {87676, 13506, 65476, 143716, 92710, 220295, 13514, 116202, 44366, 82420, 45749, 82422, 82423, 79448, 45754, 43708, 220990}: weights in range 0.45 0.752
-    predict_plot_graphs(predictor, subgraph)
+    # predict_plot_graphs(predictor, subgraph)
 
     subgraph = extract_candidate_subgraph(graph, size_range=(3, 15), weight_range=(.5, .8))
     # a small subgraph: nodes {27392, 129571, 120656, 126975}: weights in range [0.495, 0.865]
