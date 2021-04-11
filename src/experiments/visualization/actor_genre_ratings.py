@@ -12,9 +12,7 @@ from src.utils.TM_dataset import actor_name, __top_genres_list
 
 sample_count = 100
 __, actors_id = get_rating_predictor()
-genres_count = [20265, 13182, 7624, 6735, 6596, 4673, 4307, 3932, 3496, 3049, 2770, 2467, 2313, 1935, 1622,
-                1598, 1398, 1323, 1042, 767]
-actor_names = [actor_name(actor)[0] for actor in actors_id[:sample_count]]
+actor_names = [actor_name(actor) for actor in actors_id[:sample_count]]
 
 
 def get_actor_ratings(df, actor):
@@ -30,10 +28,9 @@ def create_df():
         if i == sample_count:
             break
         i += 1
-        actor_data = []
-        actor_data.append(actor_name(actor)[0])
+        actor_data = [actor_name(actor)]
         for g_id, genre in enumerate(__top_genres_list):
-            actor_data.append(rating(actor, genre) / genres_count[g_id])
+            actor_data.append(rating(actor, genre))
         data.append(actor_data)
     cols = ['Name'] + __top_genres_list
     df = pd.DataFrame(data, columns=cols)
