@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output
 
 from src.processing.GAE_on_actors import get_rating_predictor
 from src.processing.movie_cast_rating import rating
-from src.utils.TM_dataset import actor_name, __top_genres_list
+from src.utils.TM_dataset import actor_name, __top_genres_list, __top_genres_movies_count
 
 sample_count = 100
 __, actors_id = get_rating_predictor()
@@ -30,7 +30,7 @@ def create_df():
         i += 1
         actor_data = [actor_name(actor)]
         for g_id, genre in enumerate(__top_genres_list):
-            actor_data.append(rating(actor, genre))
+            actor_data.append(rating(actor, genre) / / __top_genres_movies_count[g_id])
         data.append(actor_data)
     cols = ['Name'] + __top_genres_list
     df = pd.DataFrame(data, columns=cols)
