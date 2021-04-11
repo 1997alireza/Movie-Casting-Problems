@@ -23,11 +23,9 @@ def get_actor_ratings(df, actor):
 
 def create_df():
     data = []
-    i = 0
-    for actor in actors_id:
-        if i == sample_count:
+    for a_idx, actor in enumerate(actors_id):
+        if a_idx == sample_count:
             break
-        i += 1
         actor_data = [actor_name(actor)]
         for g_id, genre in enumerate(__top_genres_list):
             actor_data.append(rating(actor, genre) / __top_genres_movies_count[g_id])
