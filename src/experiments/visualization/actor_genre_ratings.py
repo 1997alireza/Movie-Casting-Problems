@@ -30,7 +30,7 @@ def create_df():
         i += 1
         actor_data = [actor_name(actor)]
         for g_id, genre in enumerate(__top_genres_list):
-            actor_data.append(rating(actor, genre) / / __top_genres_movies_count[g_id])
+            actor_data.append(rating(actor, genre) / __top_genres_movies_count[g_id])
         data.append(actor_data)
     cols = ['Name'] + __top_genres_list
     df = pd.DataFrame(data, columns=cols)
