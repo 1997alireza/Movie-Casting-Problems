@@ -8,17 +8,18 @@ from dash.dependencies import Input, Output
 
 from src.processing.GAE_on_actors import get_rating_predictor
 from src.processing.movie_cast_rating import rating
-from src.utils.TM_dataset import actor_name, __top_genres_list, __top_genres_movies_count
+from src.utils.TM_dataset import actor_name, __top_genres_list, __top_genres_movies_count, actor_id
 
 sample_count = 100
 __, actors_id = get_rating_predictor()
-actor_names = [actor_name(actor) for actor in actors_id[:sample_count]]
+actor_names = ['Mel Brooks', 'Jack Lemmon']
 
 
-def get_actor_ratings(df, actor):
-    filtered_df = df[df.Name == actor]
-    filtered_df.pop("Name")
-    return filtered_df.values.tolist()[0]
+def get_actor_ratings(actor_id):
+    actor_data = []
+    for g_id, genre in enumerate(__top_genres_list):
+        actor_data.append(rating(actor_id, genre) / __top_genres_movies_count[g_id])
+    return actor_data
 
 
 def create_df():
@@ -35,7 +36,7 @@ def create_df():
     return df
 
 
-def radar_chart(df):
+def radar_chart():
     external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -48,15 +49,15 @@ def radar_chart(df):
         html.Div([dcc.Dropdown(
             id='input-actor-a',
             options=[{'label': actor_name, 'value': actor_name} for actor_name in actor_names],
-            value='Jim Carrey'
+            value='Mel Brooks'
         )],
-            style={'width': '48%', 'display': 'inline-block'}),
+            style={'width': '28%', 'display': 'inline-block'}),
         html.Div([dcc.Dropdown(
             id='input-actor-b',
             options=[{'label': actor_name, 'value': actor_name} for actor_name in actor_names],
-            value='Uma Thurman'
+            value='Jack Lemmon'
         )],
-            style={'width': '48%', 'display': 'inline-block'}),
+            style={'width': '28%', 'display': 'inline-block'}),
         dcc.Graph(
             id='radar-chart'
         )
@@ -70,7 +71,7 @@ def radar_chart(df):
         fig = go.Figure()
 
         fig.add_trace(go.Scatterpolar(
-            r=get_actor_ratings(df, input_actor_a),
+            r=[],
             theta=__top_genres_list,
             fill='toself',
             name=input_actor_a,
@@ -78,7 +79,7 @@ def radar_chart(df):
         ))
 
         fig.add_trace(go.Scatterpolar(
-            r=get_actor_ratings(df, input_actor_b),
+            r=get_actor_ratings(actor_id(input_actor_b)),
             theta=__top_genres_list,
             fill='toself',
             name=input_actor_b,
@@ -99,4 +100,4 @@ def radar_chart(df):
 
 
 if __name__ == '__main__':
-    radar_chart(create_df())
+    radar_chart()
