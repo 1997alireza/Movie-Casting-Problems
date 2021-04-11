@@ -1,5 +1,3 @@
-import math
-
 import plotly.graph_objects as go
 import pandas as pd
 
@@ -10,17 +8,13 @@ from dash.dependencies import Input, Output
 
 from src.processing.GAE_on_actors import get_rating_predictor
 from src.processing.movie_cast_rating import rating
-from src.utils.TM_dataset import actor_name
+from src.utils.TM_dataset import actor_name, __top_genres_list
 
 sample_count = 100
 __, actors_id = get_rating_predictor()
-genres = ['Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror', 'Crime', 'Documentary', 'Adventure',
-          'Science Fiction', 'Family', 'Mystery', 'Fantasy', 'Animation', 'Foreign', 'Music', 'History',
-          'War', 'Western', 'TV Movie']
-
 genres_count = [20265, 13182, 7624, 6735, 6596, 4673, 4307, 3932, 3496, 3049, 2770, 2467, 2313, 1935, 1622,
                 1598, 1398, 1323, 1042, 767]
-actor_names = [actor_name(actor)[0] for actor in actors_id[0:sample_count]]
+actor_names = [actor_name(actor)[0] for actor in actors_id[:sample_count]]
 
 
 def get_actor_ratings(df, actor):
@@ -38,14 +32,10 @@ def create_df():
         i += 1
         actor_data = []
         actor_data.append(actor_name(actor)[0])
-        j = 0
-        for genre in genres:
-            actor_data.append(rating(actor, genre) / genres_count[j])
-            j += 1
+        for g_id, genre in enumerate(__top_genres_list):
+            actor_data.append(rating(actor, genre) / genres_count[g_id])
         data.append(actor_data)
-    cols = ['Name', 'Drama', 'Comedy', 'Thriller', 'Romance', 'Action', 'Horror', 'Crime', 'Documentary', 'Adventure',
-            'Science Fiction', 'Family', 'Mystery', 'Fantasy', 'Animation', 'Foreign', 'Music', 'History',
-            'War', 'Western', 'TV Movie']
+    cols = ['Name'] + __top_genres_list
     df = pd.DataFrame(data, columns=cols)
     return df
 
@@ -86,7 +76,7 @@ def radar_chart(df):
 
         fig.add_trace(go.Scatterpolar(
             r=get_actor_ratings(df, input_actor_a),
-            theta=genres,
+            theta=__top_genres_list,
             fill='toself',
             name=input_actor_a,
             hoverinfo='skip'
@@ -94,7 +84,7 @@ def radar_chart(df):
 
         fig.add_trace(go.Scatterpolar(
             r=get_actor_ratings(df, input_actor_b),
-            theta=genres,
+            theta=__top_genres_list,
             fill='toself',
             name=input_actor_b,
             hoverinfo='skip'

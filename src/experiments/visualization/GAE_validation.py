@@ -110,7 +110,6 @@ if __name__ == '__main__':
     ]
 
     fig = px.line(training_losses, labels={'index': 'epochs', 'value': 'training loss'})
-    # fig.update_layout(line_color='#ff0000')
     fig['data'][0]['line']['color'] = "#ff0000"
     fig.show()
 
