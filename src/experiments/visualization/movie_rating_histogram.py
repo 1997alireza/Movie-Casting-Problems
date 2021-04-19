@@ -35,6 +35,7 @@ def ratings_histogram():
                        labels={'x': 'ratings', 'y': 'count'})
     fig.show()
 
+
 def cast_rating_histogram():
     fig = px.histogram(d, x='rating',
                        labels={'x': 'cast_rating', 'y': 'count'})
