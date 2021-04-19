@@ -1,5 +1,4 @@
 import plotly.graph_objects as go
-import pandas as pd
 
 import dash
 import dash_core_components as dcc
@@ -8,11 +7,11 @@ from dash.dependencies import Input, Output
 
 from src.processing.GAE_on_actors import get_rating_predictor
 from src.processing.movie_cast_rating import rating
-from src.utils.TM_dataset import actor_name, __top_genres_list, __top_genres_movies_count, actor_id
+from src.utils.TM_dataset import __top_genres_list, __top_genres_movies_count, actor_id
 
-sample_count = 100
 __, actors_id = get_rating_predictor()
-actor_names = ['Mel Brooks', 'Jack Lemmon']
+actor_names = ['Mel Brooks', 'Jack Lemmon', 'Steve Martin', 'Al Pacino', 'Sylvester Stallone', 'Trevor Howard',
+               'Tom Hanks', 'Bridget Fonda', 'Tony Curtis']
 
 
 def get_actor_ratings(actor_id):
@@ -22,18 +21,19 @@ def get_actor_ratings(actor_id):
     return actor_data
 
 
-def create_df():
-    data = []
-    for a_idx, actor in enumerate(actors_id):
-        if a_idx == sample_count:
-            break
-        actor_data = [actor_name(actor)]
-        for g_id, genre in enumerate(__top_genres_list):
-            actor_data.append(rating(actor, genre) / __top_genres_movies_count[g_id])
-        data.append(actor_data)
-    cols = ['Name'] + __top_genres_list
-    df = pd.DataFrame(data, columns=cols)
-    return df
+# def create_df():
+#     sample_count = 100
+#     data = []
+#     for a_idx, actor in enumerate(actors_id):
+#         if a_idx == sample_count:
+#             break
+#         actor_data = [actor_name(actor)]
+#         for g_id, genre in enumerate(__top_genres_list):
+#             actor_data.append(rating(actor, genre) / __top_genres_movies_count[g_id])
+#         data.append(actor_data)
+#     cols = ['Name'] + __top_genres_list
+#     df = pd.DataFrame(data, columns=cols)
+#     return df
 
 
 def radar_chart():
@@ -71,7 +71,7 @@ def radar_chart():
         fig = go.Figure()
 
         fig.add_trace(go.Scatterpolar(
-            r=[],
+            r=get_actor_ratings(actor_id(input_actor_a)),
             theta=__top_genres_list,
             fill='toself',
             name=input_actor_a,
