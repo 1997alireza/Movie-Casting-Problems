@@ -11,7 +11,7 @@ The main questions we have answered in this project are:
 - How to compare two casts to be choosen for a movie? [`Movie Cast Rating`](src/processing/movie_cast_rating.py)
 
 To answer these questions, we have created a graph named Actors Network and applied the graph autoencoder LoNGAE to this network.
-Mean squared error of our model on the test data for link weight prediction is 0.005406, after 50 epochs for weights between 0 and 1.
+Mean squared error of our model on the test data for link weight prediction is **0.005406**, after 50 epochs for weights between 0 and 1.
 <br>
 
 ## Actors Network
