@@ -1,6 +1,6 @@
 # Movie-Casting-Problems
 
-An attempt to use movie-related datasets to solve movie casting problems for movie producers or directors. 
+Solving movie casting problems using a graph-based neural network trained by movie-related datasets. 
 The implemented models in this project can help them to find and choose an appropriate cast for their movie.
 
 The main questions we have answered in this project are:
