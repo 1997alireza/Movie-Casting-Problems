@@ -1,4 +1,4 @@
-# Movie-Casting-Problems
+# Movie-Casting-Problems :clapper:
 
 Solving movie casting problems using a graph-based neural network trained by movie-related datasets. 
 The implemented models in this project can help them to find and choose an appropriate cast for their movie.
